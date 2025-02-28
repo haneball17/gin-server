@@ -13,8 +13,8 @@ import (
 // User 结构体定义用户信息
 type User struct {
 	UserName           string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制
-	PassWD             string `json:"passWD" binding:"min=8"`                   // 密码，长度限制
-	Email              string `json:"email" binding:"email"`                    // 邮箱，格式校验
+	PassWD             string `json:"passWD"`                                   // 密码，长度限制
+	Email              string `json:"email"`                                    // 邮箱，格式校验
 	UserID             int    `json:"userID" binding:"required"`                // 用户唯一标识，必填
 	CertAddress        string `json:"certAddress"`                              // 证书地址
 	CertDomain         string `json:"certDomain"`                               // 证书域名

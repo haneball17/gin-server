@@ -11,22 +11,22 @@ import (
 
 // User 结构体定义用户信息
 type User struct {
-	UserName           string `json:"userName" binding:"min=4,max=20"` // 用户名，长度限制
-	PassWD             string `json:"passWD" binding:"min=8"`          // 密码，长度限制
-	Email              string `json:"email" binding:"email"`           // 邮箱，格式校验
-	UserID             int    `json:"userID"`                          // 用户唯一标识
-	CertAddress        string `json:"certAddress"`                     // 证书地址
-	CertDomain         string `json:"certDomain"`                      // 证书域名
-	CertAuthType       int    `json:"certAuthType"`                    // 证书认证类型
-	CertKeyLen         int    `json:"certKeyLen"`                      // 证书密钥长度
-	SecuLevel          int    `json:"secuLevel"`                       // 安全级别
-	Status             int    `json:"status"`                          // 账户状态
-	PermissionMask     string `json:"permissionMask"`                  // 权限位掩码
-	LastLoginTimeStamp string `json:"lastLoginTimeStamp"`              // 登录时间戳
-	OffLineTimeStamp   string `json:"offLineTimeStamp"`                // 离线时间戳
-	LoginIP            string `json:"loginIP"`                         // 用户登录 IP
-	IllegalLoginTimes  int    `json:"illegalLoginTimes"`               // 用户本次的非法登录次数
-	CreatedAt          string `json:"created_at"`                      // 创建时间
+	UserName           string         `json:"userName"`           // 用户名，必填，长度限制
+	PassWD             string         `json:"passWD"`             // 密码，必填，长度限制
+	Email              string         `json:"email"`              // 邮箱，必填，格式校验
+	UserID             int            `json:"userID"`             // 用户唯一标识，必填
+	CertAddress        string         `json:"certAddress"`        // 证书地址
+	CertDomain         string         `json:"certDomain"`         // 证书域名
+	CertAuthType       int            `json:"certAuthType"`       // 证书认证类型
+	CertKeyLen         int            `json:"certKeyLen"`         // 证书密钥长度
+	SecuLevel          int            `json:"secuLevel"`          // 安全级别
+	Status             sql.NullInt64  `json:"status"`             // 账户状态，允许为 NULL
+	PermissionMask     sql.NullString `json:"permissionMask"`     // 权限位掩码，允许为 NULL
+	LastLoginTimeStamp sql.NullString `json:"lastLoginTimeStamp"` // 登录时间戳，允许为 NULL
+	OffLineTimeStamp   sql.NullString `json:"offLineTimeStamp"`   // 离线时间戳，允许为 NULL
+	LoginIP            sql.NullString `json:"loginIP"`            // 用户登录 IP，允许为 NULL
+	IllegalLoginTimes  sql.NullInt64  `json:"illegalLoginTimes"`  // 用户本次的非法登录次数，允许为 NULL
+	CreatedAt          string         `json:"created_at"`         // 创建时间
 }
 
 // Device 结构体定义设备信息
@@ -172,7 +172,8 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 		Scan(&existingUser.UserName, &existingUser.PassWD, &existingUser.Email, &existingUser.Status, &existingUser.PermissionMask, &existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp, &existingUser.LoginIP, &existingUser.IllegalLoginTimes, &existingUser.CreatedAt)
 
 	if err != nil {
-		return nil, err // 如果查询失败，返回错误
+		log.Println("获取用户信息失败:", err) // 打印错误信息
+		return nil, err               // 如果查询失败，返回错误
 	}
 
 	// 构建更新 SQL 语句
@@ -195,35 +196,35 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 		updateValues = append(updateValues, user.Email)
 		updatedFields["email"] = user.Email
 	}
-	if user.Status != 0 {
+	if user.Status.Valid { // 只在 Status 有效时更新
 		updateFields = append(updateFields, "Status=?")
-		updateValues = append(updateValues, user.Status)
-		updatedFields["status"] = user.Status
+		updateValues = append(updateValues, user.Status.Int64)
+		updatedFields["status"] = user.Status.Int64
 	}
-	if user.PermissionMask != "" {
+	if user.PermissionMask.Valid { // 只在 PermissionMask 有效时更新
 		updateFields = append(updateFields, "PermissionMask=?")
-		updateValues = append(updateValues, user.PermissionMask)
-		updatedFields["permissionMask"] = user.PermissionMask
+		updateValues = append(updateValues, user.PermissionMask.String)
+		updatedFields["permissionMask"] = user.PermissionMask.String
 	}
-	if user.LastLoginTimeStamp != "" {
+	if user.LastLoginTimeStamp.Valid { // 只在 LastLoginTimeStamp 有效时更新
 		updateFields = append(updateFields, "LastLoginTimeStamp=?")
-		updateValues = append(updateValues, user.LastLoginTimeStamp)
-		updatedFields["lastLoginTimeStamp"] = user.LastLoginTimeStamp
+		updateValues = append(updateValues, user.LastLoginTimeStamp.String)
+		updatedFields["lastLoginTimeStamp"] = user.LastLoginTimeStamp.String
 	}
-	if user.OffLineTimeStamp != "" {
+	if user.OffLineTimeStamp.Valid { // 只在 OffLineTimeStamp 有效时更新
 		updateFields = append(updateFields, "OffLineTimeStamp=?")
-		updateValues = append(updateValues, user.OffLineTimeStamp)
-		updatedFields["offLineTimeStamp"] = user.OffLineTimeStamp
+		updateValues = append(updateValues, user.OffLineTimeStamp.String)
+		updatedFields["offLineTimeStamp"] = user.OffLineTimeStamp.String
 	}
-	if user.LoginIP != "" {
+	if user.LoginIP.Valid { // 只在 LoginIP 有效时更新
 		updateFields = append(updateFields, "LoginIP=?")
-		updateValues = append(updateValues, user.LoginIP)
-		updatedFields["loginIP"] = user.LoginIP
+		updateValues = append(updateValues, user.LoginIP.String)
+		updatedFields["loginIP"] = user.LoginIP.String
 	}
-	if user.IllegalLoginTimes != 0 {
+	if user.IllegalLoginTimes.Valid { // 只在 IllegalLoginTimes 有效时更新
 		updateFields = append(updateFields, "IllegalLoginTimes=?")
-		updateValues = append(updateValues, user.IllegalLoginTimes)
-		updatedFields["illegalLoginTimes"] = user.IllegalLoginTimes
+		updateValues = append(updateValues, user.IllegalLoginTimes.Int64)
+		updatedFields["illegalLoginTimes"] = user.IllegalLoginTimes.Int64
 	}
 
 	// 如果没有字段需要更新，直接返回
@@ -238,6 +239,7 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 	updateSQL := "UPDATE users SET " + strings.Join(updateFields, ", ") + " WHERE userID=?"
 	_, err = db.Exec(updateSQL, updateValues...)
 	if err != nil {
+		log.Println("更新用户信息失败:", err) // 打印错误信息
 		return nil, err
 	}
 
