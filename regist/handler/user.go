@@ -2,8 +2,11 @@ package handler
 
 import (
 	"net/http"
+<<<<<<< HEAD
 	"strconv" // 导入 strconv 包
 	"time"    // 导入时间包
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 
 	"gin-server/regist/model"
 
@@ -12,6 +15,7 @@ import (
 
 // User 结构体定义用户信息
 type User struct {
+<<<<<<< HEAD
 	UserName           string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制
 	PassWD             string `json:"passWD" binding:"min=8"`                   // 密码，长度限制
 	Email              string `json:"email" binding:"email"`                    // 邮箱，格式校验
@@ -27,6 +31,17 @@ type User struct {
 	OffLineTimeStamp   string `json:"offLineTimeStamp"`                         // 离线时间戳
 	LoginIP            string `json:"loginIP"`                                  // 用户登录 IP
 	IllegalLoginTimes  int    `json:"illegalLoginTimes"`                        // 用户本次的非法登录次数
+=======
+	UserName     string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制
+	PassWD       string `json:"passWD" binding:"required,min=8"`          // 密码，必填，长度限制
+	Email        string `json:"email" binding:"email"`                    // 邮箱，格式校验
+	UserID       int    `json:"userID" binding:"required"`                // 用户唯一标识，必填
+	CertAddress  string `json:"certAddress" binding:"required"`           // 证书地址，必填
+	CertDomain   string `json:"certDomain" binding:"required"`            // 证书域名，必填
+	CertAuthType int    `json:"certAuthType" binding:"required"`          // 证书认证类型，必填
+	CertKeyLen   int    `json:"certKeyLen" binding:"required"`            // 证书密钥长度，必填
+	SecuLevel    int    `json:"secuLevel" binding:"required"`             // 安全级别，必填
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 }
 
 // RegisterUser 处理用户注册请求
@@ -37,6 +52,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+<<<<<<< HEAD
 	// 检查用户 ID 是否存在
 	existsID, err := model.CheckUserExistsByID(user.UserID)
 	if err != nil {
@@ -62,6 +78,11 @@ func RegisterUser(c *gin.Context) {
 	// 插入用户信息到数据库
 	db := model.GetDB() // 获取数据库连接
 	_, err = db.Exec("INSERT INTO users (userName, passWD, email, userID, certAddress, certDomain, certAuthType, certKeyLen, secuLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+=======
+	// 插入用户信息到数据库
+	db := model.GetDB() // 获取数据库连接
+	_, err := db.Exec("INSERT INTO users (userName, passWD, email, userID, certAddress, certDomain, certAuthType, certKeyLen, secuLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 		user.UserName, user.PassWD, user.Email, user.UserID, user.CertAddress, user.CertDomain, user.CertAuthType, user.CertKeyLen, user.SecuLevel)
 
 	if err != nil {
@@ -69,16 +90,23 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+<<<<<<< HEAD
 	// 获取当前时间并格式化为 ISO 8601
 	createdAt := time.Now().Format(time.RFC3339)
 
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 	c.JSON(http.StatusCreated, gin.H{
 		"code":    201,
 		"message": "User created", // 返回用户创建成功信息
 		"data": gin.H{
 			"userName":   user.UserName,
 			"email":      user.Email,
+<<<<<<< HEAD
 			"created_at": createdAt, // 返回实际创建时间
+=======
+			"created_at": "ISO8601时间戳", // 这里可以用实际时间戳替代
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 		},
 	})
 }
@@ -92,6 +120,7 @@ func GetUsers(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
+<<<<<<< HEAD
 
 // UpdateUser 处理用户修改请求
 func UpdateUser(c *gin.Context) {
@@ -121,3 +150,5 @@ func UpdateUser(c *gin.Context) {
 		"data":    updatedFields,               // 返回更新的字段
 	})
 }
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae

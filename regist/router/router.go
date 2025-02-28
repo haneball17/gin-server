@@ -9,6 +9,7 @@ import (
 // SetupRouter 设置路由
 func SetupRouter(r *gin.Engine) {
 	// 用户注册
+<<<<<<< HEAD
 	r.POST("/regist/users", handler.RegisterUser)  // 注册用户接口
 	r.GET("/search/users", handler.GetUsers)       // 获取所有用户接口
 	r.PUT("/update/users/:id", handler.UpdateUser) // 更新用户接口
@@ -16,4 +17,11 @@ func SetupRouter(r *gin.Engine) {
 	r.POST("/regist/devices", handler.RegisterDevice)  // 注册设备接口
 	r.GET("/search/devices", handler.GetDevices)       // 获取所有设备接口
 	r.PUT("/update/devices/:id", handler.UpdateDevice) // 更新设备接口
+=======
+	r.POST("/regist/users", handler.RegisterUser) // 注册用户接口
+	r.GET("/regist/users", handler.GetUsers)      // 获取所有用户接口
+	// 设备注册
+	r.POST("/search/devices", handler.RegisterDevice) // 注册设备接口
+	r.GET("/search/devices", handler.GetDevices)      // 获取所有设备接口
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 }

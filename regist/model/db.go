@@ -4,13 +4,17 @@ import (
 	"database/sql" // 导入数据库/sql 包
 	"fmt"          // 导入格式化输出包
 	"log"          // 导入日志包
+<<<<<<< HEAD
 	"strings"      // 导入 strings 包
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 
 	_ "github.com/go-sql-driver/mysql" // 导入 MySQL 驱动
 )
 
 // User 结构体定义用户信息
 type User struct {
+<<<<<<< HEAD
 	UserName           string `json:"userName" binding:"min=4,max=20"` // 用户名，长度限制
 	PassWD             string `json:"passWD" binding:"min=8"`          // 密码，长度限制
 	Email              string `json:"email" binding:"email"`           // 邮箱，格式校验
@@ -27,10 +31,23 @@ type User struct {
 	LoginIP            string `json:"loginIP"`                         // 用户登录 IP
 	IllegalLoginTimes  int    `json:"illegalLoginTimes"`               // 用户本次的非法登录次数
 	CreatedAt          string `json:"created_at"`                      // 创建时间
+=======
+	UserName     string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制
+	PassWD       string `json:"passWD" binding:"required,min=8"`          // 密码，必填，长度限制
+	Email        string `json:"email" binding:"email"`                    // 邮箱，格式校验
+	UserID       int    `json:"userID" binding:"required"`                // 用户唯一标识，必填
+	CertAddress  string `json:"certAddress" binding:"required"`           // 证书地址，必填
+	CertDomain   string `json:"certDomain" binding:"required"`            // 证书域名，必填
+	CertAuthType int    `json:"certAuthType" binding:"required"`          // 证书认证类型，必填
+	CertKeyLen   int    `json:"certKeyLen" binding:"required"`            // 证书密钥长度，必填
+	SecuLevel    int    `json:"secuLevel" binding:"required"`             // 安全级别，必填
+	CreatedAt    string `json:"created_at"`                               // 创建时间
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 }
 
 // Device 结构体定义设备信息
 type Device struct {
+<<<<<<< HEAD
 	DeviceName                string  `json:"deviceName"`                // 设备名称，长度限制
 	DeviceType                int     `json:"deviceType"`                // 设备类型
 	PassWD                    string  `json:"passWD"`                    // 设备登录口令
@@ -44,17 +61,37 @@ type Device struct {
 	CertKeyLen                int     `json:"certKeyLen"`                // 证书密钥长度
 	DeviceHardwareFingerprint *string `json:"deviceHardwareFingerprint"` // 用户的硬件指纹信息
 	CreatedAt                 string  `json:"created_at"`                // 创建时间
+=======
+	DeviceName       string `json:"deviceName" binding:"required,min=2,max=50"` // 设备名称，必填，长度限制
+	DeviceType       int    `json:"deviceType" binding:"required"`              // 设备类型，必填
+	PassWD           string `json:"passWD" binding:"required,min=8"`            // 设备登录口令，必填，长度限制
+	DeviceID         string `json:"deviceID" binding:"required,len=12"`         // 设备唯一标识，必填，固定长度
+	RegisterIP       string `json:"registerIP" binding:"required"`              // 上级设备 IP，必填
+	SuperiorDeviceID string `json:"superiorDeviceID" binding:"required"`        // 上级设备 ID，必填
+	Email            string `json:"email" binding:"email"`                      // 联系邮箱，格式校验
+	CertAddress      string `json:"certAddress" binding:"required"`             // 证书地址，必填
+	CertDomain       string `json:"certDomain" binding:"required"`              // 证书域名，必填
+	CertAuthType     int    `json:"certAuthType" binding:"required"`            // 证书认证类型，必填
+	CertKeyLen       int    `json:"certKeyLen" binding:"required"`              // 证书密钥长度，必填
+	CreatedAt        string `json:"created_at"`                                 // 创建时间
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 }
 
 var db *sql.DB // 声明数据库连接变量
 
 // InitDB 初始化数据库连接
 func InitDB() {
+<<<<<<< HEAD
 	config := LoadConfig() // 加载配置
 
 	var err error
 	// 连接数据库，DSN 格式为 "用户名:密码@tcp(主机:端口)/数据库名"
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
+=======
+	var err error
+	// 连接数据库，DSN 格式为 "用户名:密码@tcp(主机:端口)/数据库名"
+	dsn := "gin_user:your_password@tcp(127.0.0.1:3306)/gin_server"
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 	db, err = sql.Open("mysql", dsn) // 打开数据库连接
 	if err != nil {
 		log.Fatal(err) // 如果连接失败，记录错误并退出
@@ -80,12 +117,15 @@ func InitDB() {
 		certAuthType INT NOT NULL,
 		certKeyLen INT NOT NULL,
 		secuLevel INT NOT NULL,
+<<<<<<< HEAD
 		status INT,
 		permissionMask CHAR(8),
 		lastLoginTimeStamp DATETIME,
 		offLineTimeStamp DATETIME,
 		loginIP CHAR(24),
 		illegalLoginTimes INT,
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
 
@@ -109,7 +149,10 @@ func InitDB() {
 		certDomain VARCHAR(32) NOT NULL,
 		certAuthType INT NOT NULL,
 		certKeyLen INT NOT NULL,
+<<<<<<< HEAD
 		deviceHardwareFingerprint CHAR(128),
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
 
@@ -163,6 +206,7 @@ func GetAllDevices() ([]Device, error) {
 	}
 	return devices, nil
 }
+<<<<<<< HEAD
 
 // UpdateUser 更新用户信息
 func UpdateUser(userID int, user User) (map[string]interface{}, error) {
@@ -398,3 +442,5 @@ func CheckDeviceExistsByName(deviceName string) (bool, error) {
 	}
 	return count > 0, nil
 }
+=======
+>>>>>>> acf2b2b3ad5d317a7af3f00ba17d40574692a5ae
