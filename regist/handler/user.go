@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time" // 导入时间包
@@ -37,9 +38,14 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	config := model.LoadConfig() // 加载配置
+
 	// 检查用户 ID 是否存在
 	existsID, err := model.CheckUserExistsByID(user.UserID)
 	if err != nil {
+		if config.DebugLevel == "true" {
+			log.Printf("无法检查用户 ID 是否存在: %v\n", err) // 记录错误信息
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查用户 ID 是否存在"}) // 返回检查失败信息
 		return
 	}

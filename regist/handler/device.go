@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"time" // 导入时间包
 
@@ -34,9 +35,14 @@ func RegisterDevice(c *gin.Context) {
 		return
 	}
 
+	config := model.LoadConfig() // 加载配置
+
 	// 检查设备 ID 是否存在
 	existsID, err := model.CheckDeviceExistsByID(device.DeviceID)
 	if err != nil {
+		if config.DebugLevel == "true" {
+			log.Printf("无法检查设备 ID 是否存在: %v\n", err) // 记录错误信息
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查设备 ID 是否存在"}) // 返回检查失败信息
 		return
 	}

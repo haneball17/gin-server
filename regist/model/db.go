@@ -126,54 +126,76 @@ func GetDB() *sql.DB {
 	return db // 返回数据库连接
 }
 
-// GetAllUsers 查询所有用户
+// GetAllUsers 获取所有用户信息
 func GetAllUsers() ([]User, error) {
-	var users []User
-	rows, err := db.Query("SELECT userName, email, userID, certAddress, certDomain, certAuthType, certKeyLen, secuLevel, created_at FROM users")
+	log.Println("开始获取所有用户信息") // 记录开始获取用户信息的日志
+	rows, err := db.Query("SELECT userID, userName, passWD, email, Status, PermissionMask, LastLoginTimeStamp, OffLineTimeStamp, LoginIP, IllegalLoginTimes, created_at FROM users")
 	if err != nil {
-		return nil, err
+		log.Printf("获取用户列表失败: %v\n", err)           // 记录错误信息
+		return nil, fmt.Errorf("获取用户列表失败: %w", err) // 返回详细错误信息
 	}
 	defer rows.Close()
 
+	var users []User
 	for rows.Next() {
 		var user User
-		if err := rows.Scan(&user.UserName, &user.Email, &user.UserID, &user.CertAddress, &user.CertDomain, &user.CertAuthType, &user.CertKeyLen, &user.SecuLevel, &user.CreatedAt); err != nil {
-			return nil, err
+		err := rows.Scan(&user.UserID, &user.UserName, &user.PassWD, &user.Email, &user.Status, &user.PermissionMask, &user.LastLoginTimeStamp, &user.OffLineTimeStamp, &user.LoginIP, &user.IllegalLoginTimes, &user.CreatedAt)
+		if err != nil {
+			log.Printf("扫描用户信息失败: %v\n", err)           // 记录错误信息
+			return nil, fmt.Errorf("扫描用户信息失败: %w", err) // 返回详细错误信息
 		}
 		users = append(users, user)
 	}
+	log.Printf("成功获取 %d 个用户信息\n", len(users)) // 记录成功获取用户信息的日志
 	return users, nil
 }
 
-// GetAllDevices 查询所有设备
+// GetAllDevices 获取所有设备信息
 func GetAllDevices() ([]Device, error) {
-	var devices []Device
-	rows, err := db.Query("SELECT deviceName, deviceType, deviceID, registerIP, superiorDeviceID, email, certAddress, certDomain, certAuthType, certKeyLen, created_at FROM devices")
+	log.Println("开始获取所有设备信息") // 记录开始获取设备信息的日志
+	rows, err := db.Query("SELECT deviceID, deviceName, deviceType, passWD, registerIP, superiorDeviceID, email, certAddress, certDomain, certAuthType, certKeyLen, DeviceHardwareFingerprint, created_at FROM devices")
 	if err != nil {
-		return nil, err
+		log.Printf("获取设备列表失败: %v\n", err)           // 记录错误信息
+		return nil, fmt.Errorf("获取设备列表失败: %w", err) // 返回详细错误信息
 	}
 	defer rows.Close()
 
+	var devices []Device
 	for rows.Next() {
 		var device Device
-		if err := rows.Scan(&device.DeviceName, &device.DeviceType, &device.DeviceID, &device.RegisterIP, &device.SuperiorDeviceID, &device.Email, &device.CertAddress, &device.CertDomain, &device.CertAuthType, &device.CertKeyLen, &device.CreatedAt); err != nil {
-			return nil, err
+		var deviceHardwareFingerprint sql.NullString // 使用 sql.NullString 来处理可能为 NULL 的字段
+		err := rows.Scan(&device.DeviceID, &device.DeviceName, &device.DeviceType, &device.PassWD, &device.RegisterIP, &device.SuperiorDeviceID, &device.Email, &device.CertAddress, &device.CertDomain, &device.CertAuthType, &device.CertKeyLen, &deviceHardwareFingerprint, &device.CreatedAt)
+		if err != nil {
+			log.Printf("扫描设备信息失败: %v\n", err)           // 记录错误信息
+			return nil, fmt.Errorf("扫描设备信息失败: %w", err) // 返回详细错误信息
+		}
+		// 将 DeviceHardwareFingerprint 赋值给设备结构体
+		if deviceHardwareFingerprint.Valid {
+			device.DeviceHardwareFingerprint = &deviceHardwareFingerprint.String
 		}
 		devices = append(devices, device)
 	}
+	log.Printf("成功获取 %d 个设备信息\n", len(devices)) // 记录成功获取设备信息的日志
 	return devices, nil
 }
 
 // UpdateUser 更新用户信息
 func UpdateUser(userID int, user User) (map[string]interface{}, error) {
+	config := LoadConfig() // 加载配置
+	if config.DebugLevel == "true" {
+		log.Printf("开始更新用户信息，用户ID: %d\n", userID) // 记录开始更新用户信息的日志
+	}
+
 	// 获取当前用户信息
 	var existingUser User
 	err := db.QueryRow("SELECT userName, passWD, email, Status, PermissionMask, LastLoginTimeStamp, OffLineTimeStamp, LoginIP, IllegalLoginTimes, created_at FROM users WHERE userID = ?", userID).
 		Scan(&existingUser.UserName, &existingUser.PassWD, &existingUser.Email, &existingUser.Status, &existingUser.PermissionMask, &existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp, &existingUser.LoginIP, &existingUser.IllegalLoginTimes, &existingUser.CreatedAt)
 
 	if err != nil {
-		log.Println("获取用户信息失败:", err) // 打印错误信息
-		return nil, err               // 如果查询失败，返回错误
+		if config.DebugLevel == "true" {
+			log.Printf("获取用户信息失败: %v\n", err) // 记录错误信息
+		}
+		return nil, fmt.Errorf("获取用户信息失败: %w", err) // 返回详细错误信息
 	}
 
 	// 构建更新 SQL 语句
@@ -229,6 +251,7 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 
 	// 如果没有字段需要更新，直接返回
 	if len(updateFields) == 0 {
+		log.Println("没有字段需要更新") // 记录没有字段需要更新的日志
 		return nil, nil
 	}
 
@@ -239,16 +262,22 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 	updateSQL := "UPDATE users SET " + strings.Join(updateFields, ", ") + " WHERE userID=?"
 	_, err = db.Exec(updateSQL, updateValues...)
 	if err != nil {
-		log.Println("更新用户信息失败:", err) // 打印错误信息
-		return nil, err
+		log.Printf("更新用户信息失败: %v\n", err)           // 记录错误信息
+		return nil, fmt.Errorf("更新用户信息失败: %w", err) // 返回详细错误信息
 	}
 
+	log.Printf("成功更新用户信息，用户ID: %d\n", userID) // 记录成功更新用户信息的日志
 	// 返回更新的字段
 	return updatedFields, nil
 }
 
 // UpdateDevice 更新设备信息
 func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error) {
+	config := LoadConfig() // 加载配置
+	if config.DebugLevel == "true" {
+		log.Printf("开始更新设备信息，设备ID: %s\n", deviceID) // 记录开始更新设备信息的日志
+	}
+
 	// 获取当前设备信息
 	var existingDevice Device
 	var deviceHardwareFingerprint sql.NullString // 使用 sql.NullString 来处理可能为 NULL 的字段
@@ -256,8 +285,10 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 		Scan(&existingDevice.DeviceName, &existingDevice.DeviceType, &existingDevice.PassWD, &existingDevice.RegisterIP, &existingDevice.SuperiorDeviceID, &existingDevice.Email, &existingDevice.CertAddress, &existingDevice.CertDomain, &existingDevice.CertAuthType, &existingDevice.CertKeyLen, &deviceHardwareFingerprint, &existingDevice.CreatedAt)
 
 	if err != nil {
-		log.Println("获取设备信息失败:", err) // 打印错误信息
-		return nil, err               // 如果查询失败，返回错误
+		if config.DebugLevel == "true" {
+			log.Printf("获取设备信息失败: %v\n", err) // 记录错误信息
+		}
+		return nil, fmt.Errorf("获取设备信息失败: %w", err) // 返回详细错误信息
 	}
 
 	// 构建更新 SQL 语句
@@ -315,14 +346,15 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 		updateValues = append(updateValues, device.CertKeyLen)
 		updatedFields["certKeyLen"] = device.CertKeyLen
 	}
-	if device.DeviceHardwareFingerprint != nil {
+	if deviceHardwareFingerprint.Valid {
 		updateFields = append(updateFields, "DeviceHardwareFingerprint=?")
-		updateValues = append(updateValues, device.DeviceHardwareFingerprint)
-		updatedFields["deviceHardwareFingerprint"] = device.DeviceHardwareFingerprint
+		updateValues = append(updateValues, deviceHardwareFingerprint.String)
+		updatedFields["deviceHardwareFingerprint"] = deviceHardwareFingerprint.String
 	}
 
 	// 如果没有字段需要更新，直接返回
 	if len(updateFields) == 0 {
+		log.Println("没有字段需要更新") // 记录没有字段需要更新的日志
 		return nil, nil
 	}
 
@@ -333,10 +365,11 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 	updateSQL := "UPDATE devices SET " + strings.Join(updateFields, ", ") + " WHERE deviceID=?"
 	_, err = db.Exec(updateSQL, updateValues...)
 	if err != nil {
-		log.Println("更新设备信息失败:", err) // 打印错误信息
-		return nil, err
+		log.Printf("更新设备信息失败: %v\n", err)           // 记录错误信息
+		return nil, fmt.Errorf("更新设备信息失败: %w", err) // 返回详细错误信息
 	}
 
+	log.Printf("成功更新设备信息，设备ID: %s\n", deviceID) // 记录成功更新设备信息的日志
 	// 返回更新的字段
 	return updatedFields, nil
 }
