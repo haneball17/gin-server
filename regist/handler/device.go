@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time" // 导入时间包
 
 	"gin-server/regist/model"
 
@@ -41,13 +42,16 @@ func RegisterDevice(c *gin.Context) {
 		return
 	}
 
+	// 获取当前时间并格式化为 ISO 8601
+	registeredAt := time.Now().Format(time.RFC3339)
+
 	c.JSON(http.StatusCreated, gin.H{
 		"code":    201,
 		"message": "Device registered", // 返回设备注册成功信息
 		"data": gin.H{
 			"deviceName":    device.DeviceName,
 			"email":         device.Email,
-			"registered_at": "ISO8601时间戳", // 这里可以用实际时间戳替代
+			"registered_at": registeredAt, // 返回实际注册时间
 		},
 	})
 }

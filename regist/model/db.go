@@ -42,9 +42,11 @@ var db *sql.DB // 声明数据库连接变量
 
 // InitDB 初始化数据库连接
 func InitDB() {
+	config := LoadConfig() // 加载配置
+
 	var err error
 	// 连接数据库，DSN 格式为 "用户名:密码@tcp(主机:端口)/数据库名"
-	dsn := "gin_user:your_password@tcp(127.0.0.1:3306)/gin_server"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
 	db, err = sql.Open("mysql", dsn) // 打开数据库连接
 	if err != nil {
 		log.Fatal(err) // 如果连接失败，记录错误并退出

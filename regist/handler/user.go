@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time" // 导入时间包
 
 	"gin-server/regist/model"
 
@@ -39,13 +40,16 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// 获取当前时间并格式化为 ISO 8601
+	createdAt := time.Now().Format(time.RFC3339)
+
 	c.JSON(http.StatusCreated, gin.H{
 		"code":    201,
 		"message": "User created", // 返回用户创建成功信息
 		"data": gin.H{
 			"userName":   user.UserName,
 			"email":      user.Email,
-			"created_at": "ISO8601时间戳", // 这里可以用实际时间戳替代
+			"created_at": createdAt, // 返回实际创建时间
 		},
 	})
 }
