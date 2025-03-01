@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time" // 导入时间包
 
+	"gin-server/config"
 	"gin-server/regist/model"
 
 	"github.com/gin-gonic/gin"
@@ -38,12 +39,12 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	config := model.LoadConfig() // 加载配置
+	cfg := config.GetConfig() // 获取全局配置
 
 	// 检查用户 ID 是否存在
 	existsID, err := model.CheckUserExistsByID(user.UserID)
 	if err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("无法检查用户 ID 是否存在: %v\n", err) // 记录错误信息
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查用户 ID 是否存在"}) // 返回检查失败信息
@@ -91,16 +92,36 @@ func RegisterUser(c *gin.Context) {
 
 // GetUsers 处理获取所有用户的请求
 func GetUsers(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到获取所有用户的请求")
+	}
+
 	users, err := model.GetAllUsers()
 	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("获取用户列表失败: %v\n", err)
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法获取用户列表"})
 		return
 	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功获取 %d 个用户信息\n", len(users))
+	}
+
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
 // UpdateUser 处理用户修改请求
 func UpdateUser(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到更新用户的请求")
+	}
+
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息

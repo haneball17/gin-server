@@ -5,21 +5,21 @@ import (
 	"net/http"
 
 	"gin-server/auth/model"
-	configModel "gin-server/regist/model"
+	"gin-server/config"
 
 	"github.com/gin-gonic/gin"
 )
 
 // GetAuthRecords 处理获取认证记录的请求
 func GetAuthRecords(c *gin.Context) {
-	config := configModel.LoadConfig()
-	if config.DebugLevel == "true" {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
 		log.Println("接收到获取认证记录的请求")
 	}
 
 	var query model.AuthRecordQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("绑定查询参数失败: %v\n", err)
 		}
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -42,14 +42,14 @@ func GetAuthRecords(c *gin.Context) {
 		query.PageSize = 100
 	}
 
-	if config.DebugLevel == "true" {
+	if cfg.DebugLevel == "true" {
 		log.Printf("查询参数: %+v\n", query)
 	}
 
 	// 查询认证记录
 	records, total, err := model.GetAuthRecords(query)
 	if err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("查询认证记录失败: %v\n", err)
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -63,7 +63,7 @@ func GetAuthRecords(c *gin.Context) {
 	// 计算总页数
 	totalPages := (total + query.PageSize - 1) / query.PageSize
 
-	if config.DebugLevel == "true" {
+	if cfg.DebugLevel == "true" {
 		log.Printf("成功获取认证记录，总记录数: %d, 总页数: %d\n", total, totalPages)
 	}
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"gin-server/regist/model"
+	"gin-server/config"
 )
 
 // AuthRecord 认证记录结构体
@@ -38,17 +38,18 @@ var radiusDB *sql.DB
 
 // InitRadiusDB 初始化Radius数据库连接
 func InitRadiusDB() error {
-	config := model.LoadConfig()
-	if config.DebugLevel == "true" {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
 		log.Println("开始初始化Radius数据库连接")
 	}
 
 	// 构建DSN，添加parseTime=true参数
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/radius?parseTime=true",
-		config.DBUser,
-		config.DBPassword,
-		config.DBHost,
-		config.DBPort)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		cfg.RadiusDBUser,
+		cfg.RadiusDBPassword,
+		cfg.RadiusDBHost,
+		cfg.RadiusDBPort,
+		cfg.RadiusDBName)
 
 	var err error
 	radiusDB, err = sql.Open("mysql", dsn)
@@ -63,7 +64,7 @@ func InitRadiusDB() error {
 		return fmt.Errorf("Radius数据库Ping失败: %w", err)
 	}
 
-	if config.DebugLevel == "true" {
+	if cfg.DebugLevel == "true" {
 		log.Println("Radius数据库连接成功")
 	}
 	return nil
@@ -76,8 +77,8 @@ func GetRadiusDB() *sql.DB {
 
 // GetAuthRecords 获取认证记录
 func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
-	config := model.LoadConfig()
-	if config.DebugLevel == "true" {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
 		log.Printf("开始查询认证记录，查询条件: %+v\n", query)
 	}
 
@@ -131,7 +132,7 @@ func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
 	querySQL := fmt.Sprintf("SELECT id, username, pass, reply, authdate, class, calledstationid, callingstationid FROM radpostauth %s ORDER BY authdate DESC LIMIT ? OFFSET ?", whereClause)
 	args = append(args, query.PageSize, offset)
 
-	if config.DebugLevel == "true" {
+	if cfg.DebugLevel == "true" {
 		log.Printf("执行SQL: %s, 参数: %v\n", querySQL, args)
 	}
 
@@ -168,7 +169,7 @@ func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
 		records = append(records, record)
 	}
 
-	if config.DebugLevel == "true" {
+	if cfg.DebugLevel == "true" {
 		log.Printf("成功获取 %d 条认证记录，总记录数: %d\n", len(records), total)
 	}
 

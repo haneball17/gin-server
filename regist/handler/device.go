@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time" // 导入时间包
 
+	"gin-server/config"
 	"gin-server/regist/model"
 
 	"github.com/gin-gonic/gin"
@@ -35,12 +36,12 @@ func RegisterDevice(c *gin.Context) {
 		return
 	}
 
-	config := model.LoadConfig() // 加载配置
+	cfg := config.GetConfig() // 获取全局配置
 
 	// 检查设备 ID 是否存在
 	existsID, err := model.CheckDeviceExistsByID(device.DeviceID)
 	if err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("无法检查设备 ID 是否存在: %v\n", err) // 记录错误信息
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查设备 ID 是否存在"}) // 返回检查失败信息
@@ -88,16 +89,36 @@ func RegisterDevice(c *gin.Context) {
 
 // GetDevices 处理获取所有设备的请求
 func GetDevices(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到获取所有设备的请求")
+	}
+
 	devices, err := model.GetAllDevices()
 	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("获取设备列表失败: %v\n", err)
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法获取设备列表"})
 		return
 	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功获取 %d 个设备信息\n", len(devices))
+	}
+
 	c.JSON(http.StatusOK, gin.H{"devices": devices})
 }
 
 // UpdateDevice 处理设备修改请求
 func UpdateDevice(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到更新设备的请求")
+	}
+
 	var device model.Device
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息

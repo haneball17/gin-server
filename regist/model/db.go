@@ -6,6 +6,8 @@ import (
 	"log"          // 导入日志包
 	"strings"      // 导入 strings 包
 
+	"gin-server/config" // 导入全局配置包
+
 	_ "github.com/go-sql-driver/mysql" // 导入 MySQL 驱动
 )
 
@@ -50,11 +52,17 @@ var db *sql.DB // 声明数据库连接变量
 
 // InitDB 初始化数据库连接
 func InitDB() {
-	config := LoadConfig() // 加载配置
+	cfg := config.GetConfig() // 获取全局配置
 
 	var err error
 	// 连接数据库，DSN 格式为 "用户名:密码@tcp(主机:端口)/数据库名"
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBName)
+
 	db, err = sql.Open("mysql", dsn) // 打开数据库连接
 	if err != nil {
 		log.Fatal(err) // 如果连接失败，记录错误并退出
@@ -65,7 +73,9 @@ func InitDB() {
 		log.Fatal(err) // 如果连接失败，记录错误并退出
 	}
 
-	fmt.Println("数据库连接成功！") // 输出连接成功信息
+	if cfg.DebugLevel == "true" {
+		log.Println("主数据库连接成功！") // 输出连接成功信息
+	}
 
 	// 创建用户表
 	createUsersTable := `
@@ -118,7 +128,9 @@ func InitDB() {
 		log.Fatal("创建设备表失败:", err)
 	}
 
-	fmt.Println("数据库表创建成功或已存在！") // 输出表创建成功信息
+	if cfg.DebugLevel == "true" {
+		log.Println("数据库表创建成功或已存在！") // 输出表创建成功信息
+	}
 }
 
 // GetDB 返回数据库连接
@@ -128,7 +140,10 @@ func GetDB() *sql.DB {
 
 // GetAllUsers 获取所有用户信息
 func GetAllUsers() ([]User, error) {
-	log.Println("开始获取所有用户信息") // 记录开始获取用户信息的日志
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
+		log.Println("开始获取所有用户信息") // 记录开始获取用户信息的日志
+	}
 	rows, err := db.Query("SELECT userID, userName, passWD, email, Status, PermissionMask, LastLoginTimeStamp, OffLineTimeStamp, LoginIP, IllegalLoginTimes, created_at FROM users")
 	if err != nil {
 		log.Printf("获取用户列表失败: %v\n", err)           // 记录错误信息
@@ -181,8 +196,8 @@ func GetAllDevices() ([]Device, error) {
 
 // UpdateUser 更新用户信息
 func UpdateUser(userID int, user User) (map[string]interface{}, error) {
-	config := LoadConfig() // 加载配置
-	if config.DebugLevel == "true" {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
 		log.Printf("开始更新用户信息，用户ID: %d\n", userID) // 记录开始更新用户信息的日志
 	}
 
@@ -192,7 +207,7 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 		Scan(&existingUser.UserName, &existingUser.PassWD, &existingUser.Email, &existingUser.Status, &existingUser.PermissionMask, &existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp, &existingUser.LoginIP, &existingUser.IllegalLoginTimes, &existingUser.CreatedAt)
 
 	if err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("获取用户信息失败: %v\n", err) // 记录错误信息
 		}
 		return nil, fmt.Errorf("获取用户信息失败: %w", err) // 返回详细错误信息
@@ -273,8 +288,8 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 
 // UpdateDevice 更新设备信息
 func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error) {
-	config := LoadConfig() // 加载配置
-	if config.DebugLevel == "true" {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
 		log.Printf("开始更新设备信息，设备ID: %s\n", deviceID) // 记录开始更新设备信息的日志
 	}
 
@@ -285,7 +300,7 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 		Scan(&existingDevice.DeviceName, &existingDevice.DeviceType, &existingDevice.PassWD, &existingDevice.RegisterIP, &existingDevice.SuperiorDeviceID, &existingDevice.Email, &existingDevice.CertAddress, &existingDevice.CertDomain, &existingDevice.CertAuthType, &existingDevice.CertKeyLen, &deviceHardwareFingerprint, &existingDevice.CreatedAt)
 
 	if err != nil {
-		if config.DebugLevel == "true" {
+		if cfg.DebugLevel == "true" {
 			log.Printf("获取设备信息失败: %v\n", err) // 记录错误信息
 		}
 		return nil, fmt.Errorf("获取设备信息失败: %w", err) // 返回详细错误信息
