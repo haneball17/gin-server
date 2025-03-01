@@ -24,7 +24,7 @@ func LoadConfig() *Config {
 		DBPort:     getEnv("DB_PORT", "3306"),
 		DBName:     getEnv("DB_NAME", "gin_server"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
-		DebugLevel: getEnv("DEBUG_LEVEL", "true"),
+		DebugLevel: getEnv("DEBUG_LEVEL", "false"),
 	}
 }
 

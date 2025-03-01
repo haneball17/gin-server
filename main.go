@@ -1,16 +1,37 @@
 package main
 
 import (
-	"gin-server/regist/model"  // 导入数据库模型包
-	"gin-server/regist/router" // 导入路由设置包
+	"gin-server/auth/model" as authModel
+	"gin-server/auth/router" as authRouter
+	"gin-server/config"
+	"gin-server/regist/model"
+	"gin-server/regist/router"
+	"log"
 
-	"github.com/gin-gonic/gin" // 导入 Gin 框架
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	model.InitDB()                 // 初始化数据库连接
-	r := gin.Default()             // 创建一个默认的 Gin 路由引擎
-	router.SetupRouter(r)          // 设置路由
-	config := model.LoadConfig()   // 加载配置
-	r.Run(":" + config.ServerPort) // 启动服务，监听配置的端口
+	// 初始化全局配置
+	config.InitConfig()
+	cfg := config.GetConfig()
+	
+	// 初始化数据库连接
+	model.InitDB() // 初始化主数据库连接
+	
+	// 初始化Radius数据库连接
+	if err := authModel.InitRadiusDB(); err != nil {
+		log.Fatalf("初始化Radius数据库失败: %v", err)
+	}
+	
+	// 创建Gin路由引擎
+	r := gin.Default() // 创建一个默认的 Gin 路由引擎
+	
+	// 设置路由
+	router.SetupRouter(r)     // 设置注册模块路由
+	authRouter.SetupRouter(r) // 设置认证管理模块路由
+	
+	// 启动服务
+	log.Printf("服务器启动，监听端口: %s\n", cfg.ServerPort)
+	r.Run(":" + cfg.ServerPort) // 启动服务，监听配置的端口
 }
