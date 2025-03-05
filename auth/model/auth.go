@@ -64,8 +64,34 @@ func InitRadiusDB() error {
 		return fmt.Errorf("Radius数据库Ping失败: %w", err)
 	}
 
+	// 创建radpostauth表
+	createRadpostauthTable := `
+	CREATE TABLE IF NOT EXISTS radpostauth (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		username VARCHAR(64) NOT NULL DEFAULT '',
+		pass VARCHAR(64) NOT NULL DEFAULT '',
+		reply VARCHAR(64) NOT NULL DEFAULT '',
+		authdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		class VARCHAR(64) DEFAULT NULL,
+		calledstationid VARCHAR(50) DEFAULT NULL,
+		callingstationid VARCHAR(50) DEFAULT NULL,
+		INDEX idx_username (username),
+		INDEX idx_authdate (authdate),
+		INDEX idx_reply (reply)
+	);`
+
 	if cfg.DebugLevel == "true" {
-		log.Println("Radius数据库连接成功")
+		log.Println("检查并创建radpostauth表")
+	}
+
+	_, err = radiusDB.Exec(createRadpostauthTable)
+	if err != nil {
+		log.Printf("创建radpostauth表失败: %v\n", err)
+		return fmt.Errorf("创建radpostauth表失败: %w", err)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Println("Radius数据库连接成功，radpostauth表已就绪")
 	}
 	return nil
 }
