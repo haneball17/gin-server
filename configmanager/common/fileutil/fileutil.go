@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
 
 	"gin-server/config"
@@ -23,6 +25,33 @@ type FileInfo struct {
 	LastBackupAt time.Time `json:"last_backup_at"` // 最后备份时间
 }
 
+// normalizePath 统一路径处理
+func normalizePath(path string) string {
+	// 统一使用正斜杠作为路径分隔符
+	normalized := filepath.ToSlash(path)
+
+	// 处理Windows下的驱动器前缀
+	if runtime.GOOS == "windows" && len(normalized) >= 2 {
+		if normalized[1] == ':' {
+			normalized = "/" + strings.ToLower(string(normalized[0])) + normalized[2:]
+		}
+	}
+
+	return normalized
+}
+
+// denormalizePath 还原为系统特定的路径格式
+func denormalizePath(path string) string {
+	if runtime.GOOS == "windows" {
+		// 处理Windows下的驱动器前缀
+		if len(path) >= 3 && path[0] == '/' && path[2] == '/' {
+			path = string(path[1]) + ":" + path[2:]
+		}
+		return filepath.FromSlash(path)
+	}
+	return path
+}
+
 // EnsureDir 确保目录存在，如果不存在则创建
 func EnsureDir(path string) error {
 	cfg := config.GetConfig()
@@ -30,7 +59,10 @@ func EnsureDir(path string) error {
 		log.Printf("确保目录存在: %s\n", path)
 	}
 
-	err := os.MkdirAll(path, 0755)
+	// 转换为系统特定的路径格式
+	sysPath := denormalizePath(path)
+
+	err := os.MkdirAll(sysPath, 0755)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("创建目录失败: %v\n", err)
@@ -39,7 +71,7 @@ func EnsureDir(path string) error {
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Printf("目录已就绪: %s\n", path)
+		log.Printf("目录已就绪: %s\n", sysPath)
 	}
 	return nil
 }

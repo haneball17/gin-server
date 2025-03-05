@@ -6,113 +6,188 @@ import (
 	"strconv"
 )
 
-// Config 结构体定义配置项
+// Config 系统全局配置结构体
 type Config struct {
-	// 通用配置
+	// DebugLevel 调试级别
+	// 可选值: "true" - 输出详细调试日志, "false" - 仅输出基本日志
 	DebugLevel string
 
-	// 服务器配置
+	// ServerPort 服务器监听端口
+	// 格式: "端口号", 例如: "8080"
 	ServerPort string
 
-	// 主数据库配置
-	DBUser     string
+	// DBUser 主数据库用户名
+	// 用于访问系统主数据库的用户名
+	DBUser string
+
+	// DBPassword 主数据库密码
+	// 用于访问系统主数据库的密码
 	DBPassword string
-	DBHost     string
-	DBPort     string
-	DBName     string
 
-	// Radius数据库配置
-	RadiusDBUser     string
+	// DBHost 主数据库主机地址
+	// 格式: "主机名或IP地址"
+	DBHost string
+
+	// DBPort 主数据库端口
+	// 格式: "端口号"
+	DBPort string
+
+	// DBName 主数据库名称
+	// 系统主数据库的名称
+	DBName string
+
+	// RadiusDBUser Radius数据库用户名
+	// 用于访问Radius认证数据库的用户名
+	RadiusDBUser string
+
+	// RadiusDBPassword Radius数据库密码
+	// 用于访问Radius认证数据库的密码
 	RadiusDBPassword string
-	RadiusDBHost     string
-	RadiusDBPort     string
-	RadiusDBName     string
 
-	// 配置管理模块配置
+	// RadiusDBHost Radius数据库主机地址
+	// 格式: "主机名或IP地址"
+	RadiusDBHost string
+
+	// RadiusDBPort Radius数据库端口
+	// 格式: "端口号"
+	RadiusDBPort string
+
+	// RadiusDBName Radius数据库名称
+	// Radius认证数据库的名称
+	RadiusDBName string
+
+	// ConfigManager 配置管理模块配置
+	// 包含日志管理、策略管理和存储配置
 	ConfigManager ConfigManagerConfig
+
+	// Gitee Gitee仓库配置
+	// 用于远程存储和版本控制
+	Gitee *GiteeConfig `json:"gitee" yaml:"gitee"`
+
+	// FTP FTP服务器配置
+	// 用于远程文件传输
+	FTP *FTPConfig `json:"ftp" yaml:"ftp"`
 }
 
-// ConfigManagerConfig 配置管理模块配置
+// ConfigManagerConfig 配置管理模块配置结构体
 type ConfigManagerConfig struct {
-	// 日志管理配置
+	// LogManager 日志管理配置
+	// 控制日志生成和加密
 	LogManager LogManagerConfig
-	// 策略管理配置
+
+	// StrategyManager 策略管理配置
+	// 控制策略更新和加密
 	StrategyManager StrategyManagerConfig
-	// 存储配置
+
+	// Storage 存储配置
+	// 配置远程存储方式和参数
 	Storage StorageConfig
 }
 
-// LogManagerConfig 日志管理配置
+// LogManagerConfig 日志管理配置结构体
 type LogManagerConfig struct {
-	// 日志生成间隔（分钟）
+	// GenerateInterval 日志生成间隔（分钟）
+	// 指定系统生成新日志文件的时间间隔
 	GenerateInterval int
-	// 是否启用加密
+
+	// EnableEncryption 是否启用加密
+	// true: 启用日志加密, false: 不加密
 	EnableEncryption bool
-	// 加密配置
+
+	// Encryption 加密配置
+	// 指定日志加密的相关参数
 	Encryption EncryptionConfig
 }
 
-// StrategyManagerConfig 策略管理配置
+// StrategyManagerConfig 策略管理配置结构体
 type StrategyManagerConfig struct {
-	// 轮询间隔（秒）
+	// PollInterval 轮询间隔（秒）
+	// 指定检查策略更新的时间间隔
 	PollInterval int
-	// 是否启用加密
+
+	// EnableEncryption 是否启用加密
+	// true: 启用策略加密, false: 不加密
 	EnableEncryption bool
-	// 加密配置
+
+	// Encryption 加密配置
+	// 指定策略加密的相关参数
 	Encryption EncryptionConfig
 }
 
-// StorageConfig 存储配置
+// StorageConfig 存储配置结构体
 type StorageConfig struct {
-	// 存储类型 (gitee/ftp)
+	// Type 存储类型
+	// 可选值: "gitee" - 使用Gitee仓库, "ftp" - 使用FTP服务器
 	Type string
-	// Gitee配置
+
+	// Gitee Gitee配置
+	// 当Type为"gitee"时使用
 	Gitee GiteeConfig
-	// FTP配置
+
+	// FTP FTP配置
+	// 当Type为"ftp"时使用
 	FTP FTPConfig
 }
 
-// GiteeConfig Gitee配置
+// GiteeConfig Gitee配置结构体
 type GiteeConfig struct {
-	// 访问令牌
-	AccessToken string
-	// 仓库所有者
-	Owner string
-	// 仓库名称
-	Repo string
-	// 日志文件夹路径
-	LogPath string
-	// 策略文件夹路径
-	StrategyPath string
+	// AccessToken Gitee访问令牌
+	// 用于访问Gitee API的授权令牌
+	AccessToken string `json:"access_token" yaml:"access_token"`
+
+	// Owner 仓库所有者
+	// Gitee仓库所有者的用户名或组织名
+	Owner string `json:"owner" yaml:"owner"`
+
+	// Repo 仓库名称
+	// Gitee仓库的名称
+	Repo string `json:"repo" yaml:"repo"`
+
+	// Branch 分支名称
+	// 要操作的Git分支名称，默认为"master"
+	Branch string `json:"branch" yaml:"branch"`
 }
 
-// FTPConfig FTP配置
+// FTPConfig FTP配置结构体
 type FTPConfig struct {
-	// FTP服务器地址
-	Host string
-	// FTP服务器端口
-	Port int
-	// 用户名
-	Username string
-	// 密码
-	Password string
-	// 日志文件夹路径
-	LogPath string
-	// 策略文件夹路径
-	StrategyPath string
+	// Host FTP服务器地址
+	// 格式: "主机名或IP地址"
+	Host string `json:"host" yaml:"host"`
+
+	// Port FTP服务器端口
+	// 默认为21
+	Port int `json:"port" yaml:"port"`
+
+	// Username FTP用户名
+	// 用于FTP服务器认证
+	Username string `json:"username" yaml:"username"`
+
+	// Password FTP密码
+	// 用于FTP服务器认证
+	Password string `json:"password" yaml:"password"`
 }
 
-// EncryptionConfig 加密配置
+// EncryptionConfig 加密配置结构体
 type EncryptionConfig struct {
-	// AES密钥长度
+	// AESKeyLength AES密钥长度
+	// 可选值: 128, 192, 256
 	AESKeyLength int
-	// 公钥加密方式 (RSA/ECDSA/ED25519)
+
+	// PublicKeyAlgorithm 公钥加密算法
+	// 可选值: "RSA", "ECDSA", "ED25519"
 	PublicKeyAlgorithm string
-	// 公钥长度
+
+	// PublicKeyLength 公钥长度
+	// RSA推荐: 2048或4096
+	// ECDSA推荐: 256或384
 	PublicKeyLength int
-	// 运维系统公钥路径
+
+	// PublicKeyPath 运维系统公钥路径
+	// 用于加密的公钥文件路径
 	PublicKeyPath string
-	// 本系统私钥路径
+
+	// PrivateKeyPath 本系统私钥路径
+	// 用于解密的私钥文件路径
 	PrivateKeyPath string
 }
 
@@ -125,7 +200,7 @@ func InitConfig() {
 
 	globalConfig = &Config{
 		// 通用配置
-		DebugLevel: getEnv("DEBUG_LEVEL", "false"),
+		DebugLevel: getEnv("DEBUG_LEVEL", "true"),
 
 		// 服务器配置
 		ServerPort: getEnv("SERVER_PORT", "8080"),
@@ -174,22 +249,29 @@ func InitConfig() {
 			Storage: StorageConfig{
 				Type: getEnv("STORAGE_TYPE", "gitee"),
 				Gitee: GiteeConfig{
-					AccessToken:  getEnv("GITEE_ACCESS_TOKEN", ""),
-					Owner:        getEnv("GITEE_OWNER", ""),
-					Repo:         getEnv("GITEE_REPO", ""),
-					LogPath:      getEnv("GITEE_LOG_PATH", "logs"),
-					StrategyPath: getEnv("GITEE_STRATEGY_PATH", "strategy"),
+					AccessToken: getEnv("GITEE_ACCESS_TOKEN", "684ed853186d45b825b415b00f16bf27"),
+					Owner:       getEnv("GITEE_OWNER", "xxxLogTest"),
+					Repo:        getEnv("GITEE_REPO", "logtest"),
+					Branch:      getEnv("GITEE_BRANCH", "master"),
 				},
 				FTP: FTPConfig{
-					Host:         getEnv("FTP_HOST", "127.0.0.1"),
-					Port:         getEnvInt("FTP_PORT", 21),
-					Username:     getEnv("FTP_USERNAME", ""),
-					Password:     getEnv("FTP_PASSWORD", ""),
-					LogPath:      getEnv("FTP_LOG_PATH", "logs"),
-					StrategyPath: getEnv("FTP_STRATEGY_PATH", "strategy"),
+					Host:     getEnv("FTP_HOST", "127.0.0.1"),
+					Port:     getEnvInt("FTP_PORT", 21),
+					Username: getEnv("FTP_USERNAME", ""),
+					Password: getEnv("FTP_PASSWORD", ""),
 				},
 			},
 		},
+	}
+
+	// 设置Gitee配置
+	if globalConfig.ConfigManager.Storage.Type == "gitee" {
+		globalConfig.Gitee = &GiteeConfig{
+			AccessToken: getEnv("GITEE_ACCESS_TOKEN", "684ed853186d45b825b415b00f16bf27"),
+			Owner:       getEnv("GITEE_OWNER", "xxxLogTest"),
+			Repo:        getEnv("GITEE_REPO", "logtest"),
+			Branch:      getEnv("GITEE_BRANCH", "master"),
+		}
 	}
 
 	if globalConfig.DebugLevel == "true" {
@@ -236,4 +318,16 @@ func getEnvBool(key string, defaultValue bool) bool {
 		}
 	}
 	return defaultValue
+}
+
+// DefaultConfig 返回默认配置
+func DefaultConfig() *Config {
+	return &Config{
+		Gitee: &GiteeConfig{
+			Branch: "master",
+		},
+		FTP: &FTPConfig{
+			Port: 21,
+		},
+	}
 }
