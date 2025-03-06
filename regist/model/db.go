@@ -328,11 +328,11 @@ func GetAllUsers() ([]User, error) {
 		var status sql.NullInt64
 		var permissionMask, lastLoginTimeStamp, offLineTimeStamp, loginIP sql.NullString
 		var illegalLoginTimes sql.NullInt64
-		var certID, keyID sql.NullString
+		var certID, keyID, email sql.NullString
 
 		err := rows.Scan(
 			&user.UserName, &user.PassWD, &user.UserID, &user.UserType, &user.GatewayDeviceID,
-			&status, &certID, &keyID, &user.Email, &user.OnlineDuration,
+			&status, &certID, &keyID, &email, &user.OnlineDuration,
 			&permissionMask, &lastLoginTimeStamp, &offLineTimeStamp,
 			&loginIP, &illegalLoginTimes, &user.CreatedAt,
 		)
@@ -373,6 +373,9 @@ func GetAllUsers() ([]User, error) {
 		}
 		if keyID.Valid {
 			user.KeyID = keyID.String
+		}
+		if email.Valid {
+			user.Email = email.String
 		}
 
 		users = append(users, user)
@@ -420,13 +423,13 @@ func GetAllDevices() ([]Device, error) {
 	for rows.Next() {
 		var device Device
 		var deviceHardwareFingerprint, anonymousUser sql.NullString
-		var certID, keyID sql.NullString
+		var certID, keyID, registerIP, email sql.NullString
 		var deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration sql.NullInt64
 
 		err := rows.Scan(
 			&device.DeviceName, &device.DeviceType, &device.PassWD, &device.DeviceID, &device.SuperiorDeviceID,
 			&deviceStatus, &peakCPUUsage, &peakMemoryUsage, &onlineDuration,
-			&certID, &keyID, &device.RegisterIP, &device.Email,
+			&certID, &keyID, &registerIP, &email,
 			&deviceHardwareFingerprint, &anonymousUser, &device.CreatedAt,
 		)
 		if err != nil {
@@ -448,6 +451,12 @@ func GetAllDevices() ([]Device, error) {
 		}
 		if keyID.Valid {
 			device.KeyID = keyID.String
+		}
+		if registerIP.Valid {
+			device.RegisterIP = registerIP.String
+		}
+		if email.Valid {
+			device.Email = email.String
 		}
 		if deviceStatus.Valid {
 			device.DeviceStatus = int(deviceStatus.Int64)
@@ -495,13 +504,18 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 		loginIP, illegalLoginTimes, created_at 
 	FROM users WHERE userID = ?`
 
+	var email, certID, keyID sql.NullString
+	var status sql.NullInt64
+	var permissionMask, lastLoginTimeStamp, offLineTimeStamp, loginIP sql.NullString
+	var illegalLoginTimes sql.NullInt64
+
 	err := db.QueryRow(query, userID).Scan(
-		&existingUser.UserName, &existingUser.PassWD, &existingUser.Email,
+		&existingUser.UserName, &existingUser.PassWD, &email,
 		&existingUser.UserType, &existingUser.GatewayDeviceID,
-		&existingUser.Status, &existingUser.CertID, &existingUser.KeyID,
-		&existingUser.OnlineDuration, &existingUser.PermissionMask,
-		&existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp,
-		&existingUser.LoginIP, &existingUser.IllegalLoginTimes,
+		&status, &certID, &keyID,
+		&existingUser.OnlineDuration, &permissionMask,
+		&lastLoginTimeStamp, &offLineTimeStamp,
+		&loginIP, &illegalLoginTimes,
 		&existingUser.CreatedAt,
 	)
 
@@ -510,6 +524,41 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 			log.Printf("获取用户信息失败: %v\n", err)
 		}
 		return nil, fmt.Errorf("获取用户信息失败: %w", err)
+	}
+
+	// 处理可能为 NULL 的字段
+	if email.Valid {
+		existingUser.Email = email.String
+	}
+	if certID.Valid {
+		existingUser.CertID = certID.String
+	}
+	if keyID.Valid {
+		existingUser.KeyID = keyID.String
+	}
+	if status.Valid {
+		existingUser.Status.Int64 = status.Int64
+		existingUser.Status.Valid = true
+	}
+	if permissionMask.Valid {
+		existingUser.PermissionMask.String = permissionMask.String
+		existingUser.PermissionMask.Valid = true
+	}
+	if lastLoginTimeStamp.Valid {
+		existingUser.LastLoginTimeStamp.String = lastLoginTimeStamp.String
+		existingUser.LastLoginTimeStamp.Valid = true
+	}
+	if offLineTimeStamp.Valid {
+		existingUser.OffLineTimeStamp.String = offLineTimeStamp.String
+		existingUser.OffLineTimeStamp.Valid = true
+	}
+	if loginIP.Valid {
+		existingUser.LoginIP.String = loginIP.String
+		existingUser.LoginIP.Valid = true
+	}
+	if illegalLoginTimes.Valid {
+		existingUser.IllegalLoginTimes.Int64 = illegalLoginTimes.Int64
+		existingUser.IllegalLoginTimes.Valid = true
 	}
 
 	// 构建更新 SQL 语句
@@ -654,13 +703,13 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 	FROM devices WHERE deviceID = ?`
 
 	var deviceHardwareFingerprint, anonymousUser sql.NullString
-	var certID, keyID sql.NullString
+	var certID, keyID, registerIP, email sql.NullString
 	var deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration sql.NullInt64
 
 	err := db.QueryRow(query, deviceID).Scan(
 		&existingDevice.DeviceName, &existingDevice.DeviceType, &existingDevice.PassWD, &existingDevice.SuperiorDeviceID,
 		&deviceStatus, &peakCPUUsage, &peakMemoryUsage, &onlineDuration,
-		&certID, &keyID, &existingDevice.RegisterIP, &existingDevice.Email,
+		&certID, &keyID, &registerIP, &email,
 		&deviceHardwareFingerprint, &anonymousUser, &existingDevice.CreatedAt,
 	)
 
@@ -683,6 +732,12 @@ func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error
 	}
 	if keyID.Valid {
 		existingDevice.KeyID = keyID.String
+	}
+	if registerIP.Valid {
+		existingDevice.RegisterIP = registerIP.String
+	}
+	if email.Valid {
+		existingDevice.Email = email.String
 	}
 	if deviceStatus.Valid {
 		existingDevice.DeviceStatus = int(deviceStatus.Int64)
