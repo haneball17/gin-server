@@ -5,6 +5,7 @@ import (
 	"fmt"          // 导入格式化输出包
 	"log"          // 导入日志包
 	"strings"      // 导入 strings 包
+	"time"         // 导入 time 包
 
 	"gin-server/config" // 导入全局配置包
 
@@ -13,42 +14,155 @@ import (
 
 // User 结构体定义用户信息
 type User struct {
-	UserName           string         `json:"userName"`           // 用户名，必填，长度限制
-	PassWD             string         `json:"passWD"`             // 密码，必填，长度限制
-	Email              string         `json:"email"`              // 邮箱，必填，格式校验
-	UserID             int            `json:"userID"`             // 用户唯一标识，必填
-	CertAddress        string         `json:"certAddress"`        // 证书地址
-	CertDomain         string         `json:"certDomain"`         // 证书域名
-	CertAuthType       int            `json:"certAuthType"`       // 证书认证类型
-	CertKeyLen         int            `json:"certKeyLen"`         // 证书密钥长度
-	SecuLevel          int            `json:"secuLevel"`          // 安全级别
-	Status             sql.NullInt64  `json:"status"`             // 账户状态，允许为 NULL
+	UserName        string `json:"userName"`        // 用户名，必填，长度限制，注册时需要
+	PassWD          string `json:"passWD"`          // 密码，必填，长度限制，注册时需要
+	UserID          int    `json:"userID"`          // 用户唯一标识，必填，注册时需要
+	UserType        int    `json:"userType"`        // 用户类型，注册时需要
+	GatewayDeviceID string `json:"gatewayDeviceID"` // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
+
+	Status         sql.NullInt64 `json:"status"`         // 账户状态，允许为 NULL，上报时需要
+	OnlineDuration int           `json:"onlineDuration"` // 在线时长，上报时需要，允许为 NULL
+
+	CertID             string         `json:"certID"`             // 证书ID，允许为 NULL
+	KeyID              string         `json:"keyID"`              // 密钥ID，允许为 NULL
+	Email              string         `json:"email"`              // 邮箱，格式校验，允许为 NULL
 	PermissionMask     sql.NullString `json:"permissionMask"`     // 权限位掩码，允许为 NULL
 	LastLoginTimeStamp sql.NullString `json:"lastLoginTimeStamp"` // 登录时间戳，允许为 NULL
 	OffLineTimeStamp   sql.NullString `json:"offLineTimeStamp"`   // 离线时间戳，允许为 NULL
 	LoginIP            sql.NullString `json:"loginIP"`            // 用户登录 IP，允许为 NULL
 	IllegalLoginTimes  sql.NullInt64  `json:"illegalLoginTimes"`  // 用户本次的非法登录次数，允许为 NULL
-	CreatedAt          string         `json:"created_at"`         // 创建时间
+
+	CreatedAt string `json:"created_at"` // 创建时间
+}
+
+// UserBehavior 结构体定义用户行为信息
+type UserBehavior struct {
+	UserID       int       `json:"userID"`       // 用户ID，作为外键关联到用户表
+	BehaviorID   int       `json:"behaviorID"`   // 行为ID
+	BehaviorTime time.Time `json:"behaviorTime"` // 行为开始时间
+	BehaviorType int       `json:"behaviorType"` // 行为类型，1代表发送，2代表输出
+	DataType     int       `json:"dataType"`     // 数据类型，1代表文件，2代表消息
+	DataSize     int64     `json:"dataSize"`     // 数据大小
 }
 
 // Device 结构体定义设备信息
 type Device struct {
-	DeviceName                string  `json:"deviceName"`                // 设备名称，长度限制
-	DeviceType                int     `json:"deviceType"`                // 设备类型
-	PassWD                    string  `json:"passWD"`                    // 设备登录口令
-	DeviceID                  string  `json:"deviceID"`                  // 设备唯一标识
-	RegisterIP                string  `json:"registerIP"`                // 上级设备 IP
-	SuperiorDeviceID          string  `json:"superiorDeviceID"`          // 上级设备 ID
-	Email                     string  `json:"email"`                     // 联系邮箱
-	CertAddress               string  `json:"certAddress"`               // 证书地址
-	CertDomain                string  `json:"certDomain"`                // 证书域名
-	CertAuthType              int     `json:"certAuthType"`              // 证书认证类型
-	CertKeyLen                int     `json:"certKeyLen"`                // 证书密钥长度
-	DeviceHardwareFingerprint *string `json:"deviceHardwareFingerprint"` // 用户的硬件指纹信息
-	CreatedAt                 string  `json:"created_at"`                // 创建时间
+	DeviceName       string `json:"deviceName"`       // 设备名称，长度限制，注册时需要
+	DeviceType       int    `json:"deviceType"`       // 设备类型，1代表网关设备A型，2代表网关设备B型，3代表网关设备C型，4代表安全接入管理设备，注册时需要
+	PassWD           string `json:"passWD"`           // 设备登录口令，注册时需要
+	DeviceID         string `json:"deviceID"`         // 设备唯一标识，注册时需要
+	SuperiorDeviceID string `json:"superiorDeviceID"` // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为空
+
+	DeviceStatus    int `json:"deviceStatus"`    // 设备状态，1代表在线，2代表离线，3代表冻结，4代表注销，上报时需要,允许为 NULL
+	PeakCPUUsage    int `json:"peakCPUUsage"`    // 峰值CPU使用率，上报时需要，允许为 NULL
+	PeakMemoryUsage int `json:"peakMemoryUsage"` // 峰值内存使用率，上报时需要，允许为 NULL
+	OnlineDuration  int `json:"onlineDuration"`  // 在线时长，上报时需要，允许为 NULL
+
+	CertID                    string  `json:"certID"`                    // 证书ID，允许为 NULL
+	KeyID                     string  `json:"keyID"`                     // 密钥ID，允许为 NULL
+	RegisterIP                string  `json:"registerIP"`                // 上级设备 IP，允许为 NULL
+	Email                     string  `json:"email"`                     // 联系邮箱，允许为 NULL
+	DeviceHardwareFingerprint *string `json:"deviceHardwareFingerprint"` // 用户的硬件指纹信息，允许为 NULL
+	AnonymousUser             *string `json:"anonymousUser"`             // 匿名用户，允许为 NULL
+
+	CreatedAt string `json:"created_at"` // 创建时间
 }
 
 var db *sql.DB // 声明数据库连接变量
+
+// ResetDB 删除并重新创建数据库表
+func ResetDB() error {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
+		log.Println("开始重置数据库表...")
+	}
+
+	// 删除现有表
+	dropTables := []string{
+		"DROP TABLE IF EXISTS users",
+		"DROP TABLE IF EXISTS devices",
+	}
+
+	for _, query := range dropTables {
+		if cfg.DebugLevel == "true" {
+			log.Printf("执行SQL: %s\n", query)
+		}
+		if _, err := db.Exec(query); err != nil {
+			return fmt.Errorf("删除表失败: %w", err)
+		}
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Println("已删除现有表，开始创建新表...")
+	}
+
+	// 创建用户表
+	createUsersTable := `
+	CREATE TABLE IF NOT EXISTS users (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		userName VARCHAR(20) NOT NULL COLLATE utf8mb4_unicode_ci,
+		passWD VARCHAR(255) NOT NULL,
+		userID INT NOT NULL,
+		userType INT NOT NULL,
+		gatewayDeviceID VARCHAR(12) NOT NULL,
+		status INT NULL,
+		onlineDuration INT NULL DEFAULT 0,
+		certID VARCHAR(64) NULL,
+		keyID VARCHAR(64) NULL,
+		email VARCHAR(32) NULL COLLATE utf8mb4_unicode_ci,
+		permissionMask CHAR(8) NULL,
+		lastLoginTimeStamp DATETIME(3) NULL,
+		offLineTimeStamp DATETIME(3) NULL,
+		loginIP CHAR(24) NULL,
+		illegalLoginTimes INT NULL,
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_userid (userID),
+		INDEX idx_username (userName),
+		INDEX idx_email (email),
+		INDEX idx_gatewaydeviceid (gatewayDeviceID),
+		FOREIGN KEY (gatewayDeviceID) REFERENCES devices(deviceID) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+
+	// 创建设备表
+	createDevicesTable := `
+	CREATE TABLE IF NOT EXISTS devices (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		deviceName VARCHAR(50) NOT NULL COLLATE utf8mb4_unicode_ci,
+		deviceType INT NOT NULL,
+		passWD VARCHAR(255) NOT NULL,
+		deviceID CHAR(12) NOT NULL,
+		superiorDeviceID CHAR(12) NOT NULL,
+		deviceStatus INT NULL DEFAULT 2,
+		peakCPUUsage INT NULL DEFAULT 0,
+		peakMemoryUsage INT NULL DEFAULT 0,
+		onlineDuration INT NULL DEFAULT 0,
+		certID VARCHAR(64) NULL,
+		keyID VARCHAR(64) NULL,
+		registerIP VARCHAR(24) NULL,
+		email VARCHAR(32) NULL COLLATE utf8mb4_unicode_ci,
+		deviceHardwareFingerprint CHAR(128) NULL,
+		anonymousUser VARCHAR(50) NULL,
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_deviceid (deviceID),
+		INDEX idx_devicename (deviceName),
+		INDEX idx_superiordeviceid (superiorDeviceID)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+
+	// 先创建设备表，因为用户表有外键引用
+	if _, err := db.Exec(createDevicesTable); err != nil {
+		return fmt.Errorf("创建设备表失败: %w", err)
+	}
+
+	// 再创建用户表
+	if _, err := db.Exec(createUsersTable); err != nil {
+		return fmt.Errorf("创建用户表失败: %w", err)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Println("数据库表重置成功！")
+	}
+	return nil
+}
 
 // InitDB 初始化数据库连接
 func InitDB() {
@@ -77,66 +191,106 @@ func InitDB() {
 		log.Println("主数据库连接成功！") // 输出连接成功信息
 	}
 
-	// 创建用户表
-	createUsersTable := `
-	CREATE TABLE IF NOT EXISTS users (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		userName VARCHAR(20) NOT NULL COLLATE utf8mb4_unicode_ci,
-		passWD VARCHAR(255) ,
-		email VARCHAR(32) COLLATE utf8mb4_unicode_ci,
-		userID INT NOT NULL,
-		certAddress VARCHAR(32) ,
-		certDomain VARCHAR(32) ,
-		certAuthType INT ,
-		certKeyLen INT ,
-		secuLevel INT ,
-		status INT,
-		permissionMask CHAR(8),
-		lastLoginTimeStamp DATETIME(3),
-		offLineTimeStamp DATETIME(3),
-		loginIP CHAR(24),
-		illegalLoginTimes INT,
-		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
-		INDEX idx_userid (userID),
-		INDEX idx_username (userName),
-		INDEX idx_email (email)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+	// 检查并创建表（如果不存在）
+	if err := ensureTablesExist(); err != nil {
+		log.Fatal("确保数据库表存在时发生错误:", err)
+	}
+}
 
-	_, err = db.Exec(createUsersTable)
-	if err != nil {
-		log.Fatal("创建用户表失败:", err)
+// ensureTablesExist 确保必要的表存在
+func ensureTablesExist() error {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
+		log.Println("检查并创建必要的数据库表...")
 	}
 
 	// 创建设备表
 	createDevicesTable := `
 	CREATE TABLE IF NOT EXISTS devices (
 		id INT AUTO_INCREMENT PRIMARY KEY,
-		deviceName VARCHAR(50) COLLATE utf8mb4_unicode_ci,
-		deviceType INT ,
-		passWD VARCHAR(255) ,
-		deviceID CHAR(12) ,
-		registerIP VARCHAR(24) ,
-		superiorDeviceID CHAR(12) ,
-		email VARCHAR(32) COLLATE utf8mb4_unicode_ci,
-		certAddress VARCHAR(32) ,
-		certDomain VARCHAR(32) ,
-		certAuthType INT ,
-		certKeyLen INT ,
-		deviceHardwareFingerprint CHAR(128),
+		deviceName VARCHAR(50) NOT NULL COLLATE utf8mb4_unicode_ci,
+		deviceType INT NOT NULL,
+		passWD VARCHAR(255) NOT NULL,
+		deviceID CHAR(12) NOT NULL,
+		superiorDeviceID CHAR(12) NOT NULL,
+		deviceStatus INT NULL DEFAULT 2,
+		peakCPUUsage INT NULL DEFAULT 0,
+		peakMemoryUsage INT NULL DEFAULT 0,
+		onlineDuration INT NULL DEFAULT 0,
+		certID VARCHAR(64) NULL,
+		keyID VARCHAR(64) NULL,
+		registerIP VARCHAR(24) NULL,
+		email VARCHAR(32) NULL COLLATE utf8mb4_unicode_ci,
+		deviceHardwareFingerprint CHAR(128) NULL,
+		anonymousUser VARCHAR(50) NULL,
 		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
 		INDEX idx_deviceid (deviceID),
 		INDEX idx_devicename (deviceName),
 		INDEX idx_superiordeviceid (superiorDeviceID)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
-	_, err = db.Exec(createDevicesTable)
-	if err != nil {
-		log.Fatal("创建设备表失败:", err)
+	// 创建用户表
+	createUsersTable := `
+	CREATE TABLE IF NOT EXISTS users (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		userName VARCHAR(20) NOT NULL COLLATE utf8mb4_unicode_ci,
+		passWD VARCHAR(255) NOT NULL,
+		userID INT NOT NULL,
+		userType INT NOT NULL,
+		gatewayDeviceID VARCHAR(12) NOT NULL,
+		status INT NULL,
+		onlineDuration INT NULL DEFAULT 0,
+		certID VARCHAR(64) NULL,
+		keyID VARCHAR(64) NULL,
+		email VARCHAR(32) NULL COLLATE utf8mb4_unicode_ci,
+		permissionMask CHAR(8) NULL,
+		lastLoginTimeStamp DATETIME(3) NULL,
+		offLineTimeStamp DATETIME(3) NULL,
+		loginIP CHAR(24) NULL,
+		illegalLoginTimes INT NULL,
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_userid (userID),
+		INDEX idx_username (userName),
+		INDEX idx_email (email),
+		INDEX idx_gatewaydeviceid (gatewayDeviceID),
+		FOREIGN KEY (gatewayDeviceID) REFERENCES devices(deviceID) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+
+	// 创建用户行为表
+	createUserBehaviorTable := `
+	CREATE TABLE IF NOT EXISTS user_behaviors (
+		behaviorID INT AUTO_INCREMENT PRIMARY KEY,
+		userID INT NOT NULL,
+		behaviorTime DATETIME(3) NOT NULL,
+		behaviorType INT NOT NULL COMMENT '1:发送 2:输出',
+		dataType INT NOT NULL COMMENT '1:文件 2:消息',
+		dataSize BIGINT NOT NULL,
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_userid (userID),
+		INDEX idx_behaviortime (behaviorTime),
+		INDEX idx_behaviortype (behaviorType),
+		FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+
+	// 先创建设备表
+	if _, err := db.Exec(createDevicesTable); err != nil {
+		return fmt.Errorf("创建设备表失败: %w", err)
+	}
+
+	// 再创建用户表
+	if _, err := db.Exec(createUsersTable); err != nil {
+		return fmt.Errorf("创建用户表失败: %w", err)
+	}
+
+	// 最后创建用户行为表
+	if _, err := db.Exec(createUserBehaviorTable); err != nil {
+		return fmt.Errorf("创建用户行为表失败: %w", err)
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Println("数据库表创建成功或已存在！") // 输出表创建成功信息
+		log.Println("数据库表检查完成！")
 	}
+	return nil
 }
 
 // GetDB 返回数据库连接
@@ -144,135 +298,304 @@ func GetDB() *sql.DB {
 	return db // 返回数据库连接
 }
 
-// GetAllUsers 获取所有用户信息
+// GetAllUsers 获取所有用户的全部信息
 func GetAllUsers() ([]User, error) {
 	cfg := config.GetConfig()
 	if cfg.DebugLevel == "true" {
-		log.Println("开始获取所有用户信息") // 记录开始获取用户信息的日志
+		log.Println("开始获取所有用户信息")
 	}
-	rows, err := db.Query("SELECT userID, userName, passWD, email, Status, PermissionMask, LastLoginTimeStamp, OffLineTimeStamp, LoginIP, IllegalLoginTimes, created_at FROM users")
+
+	db := GetDB()
+	query := `SELECT 
+		userName, passWD, userID, userType, gatewayDeviceID,
+		status, certID, keyID, email, onlineDuration,
+		permissionMask, lastLoginTimeStamp, offLineTimeStamp,
+		loginIP, illegalLoginTimes, created_at 
+	FROM users`
+
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Printf("获取用户列表失败: %v\n", err)           // 记录错误信息
-		return nil, fmt.Errorf("获取用户列表失败: %w", err) // 返回详细错误信息
+		if cfg.DebugLevel == "true" {
+			log.Printf("查询用户信息失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("查询用户信息失败: %w", err)
 	}
 	defer rows.Close()
 
 	var users []User
 	for rows.Next() {
 		var user User
-		err := rows.Scan(&user.UserID, &user.UserName, &user.PassWD, &user.Email, &user.Status, &user.PermissionMask, &user.LastLoginTimeStamp, &user.OffLineTimeStamp, &user.LoginIP, &user.IllegalLoginTimes, &user.CreatedAt)
+		var status sql.NullInt64
+		var permissionMask, lastLoginTimeStamp, offLineTimeStamp, loginIP sql.NullString
+		var illegalLoginTimes sql.NullInt64
+		var certID, keyID sql.NullString
+
+		err := rows.Scan(
+			&user.UserName, &user.PassWD, &user.UserID, &user.UserType, &user.GatewayDeviceID,
+			&status, &certID, &keyID, &user.Email, &user.OnlineDuration,
+			&permissionMask, &lastLoginTimeStamp, &offLineTimeStamp,
+			&loginIP, &illegalLoginTimes, &user.CreatedAt,
+		)
 		if err != nil {
-			log.Printf("扫描用户信息失败: %v\n", err)           // 记录错误信息
-			return nil, fmt.Errorf("扫描用户信息失败: %w", err) // 返回详细错误信息
+			if cfg.DebugLevel == "true" {
+				log.Printf("扫描用户信息失败: %v\n", err)
+			}
+			return nil, fmt.Errorf("扫描用户信息失败: %w", err)
 		}
+
+		// 处理可能为 NULL 的字段
+		if status.Valid {
+			user.Status.Int64 = status.Int64
+			user.Status.Valid = true
+		}
+		if permissionMask.Valid {
+			user.PermissionMask.String = permissionMask.String
+			user.PermissionMask.Valid = true
+		}
+		if lastLoginTimeStamp.Valid {
+			user.LastLoginTimeStamp.String = lastLoginTimeStamp.String
+			user.LastLoginTimeStamp.Valid = true
+		}
+		if offLineTimeStamp.Valid {
+			user.OffLineTimeStamp.String = offLineTimeStamp.String
+			user.OffLineTimeStamp.Valid = true
+		}
+		if loginIP.Valid {
+			user.LoginIP.String = loginIP.String
+			user.LoginIP.Valid = true
+		}
+		if illegalLoginTimes.Valid {
+			user.IllegalLoginTimes.Int64 = illegalLoginTimes.Int64
+			user.IllegalLoginTimes.Valid = true
+		}
+		if certID.Valid {
+			user.CertID = certID.String
+		}
+		if keyID.Valid {
+			user.KeyID = keyID.String
+		}
+
 		users = append(users, user)
 	}
-	log.Printf("成功获取 %d 个用户信息\n", len(users)) // 记录成功获取用户信息的日志
+
+	if err = rows.Err(); err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("遍历用户信息时发生错误: %v\n", err)
+		}
+		return nil, fmt.Errorf("遍历用户信息时发生错误: %w", err)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功获取 %d 个用户信息\n", len(users))
+	}
+
 	return users, nil
 }
 
-// GetAllDevices 获取所有设备信息
+// GetAllDevices 获取所有设备的全部信息
 func GetAllDevices() ([]Device, error) {
-	log.Println("开始获取所有设备信息") // 记录开始获取设备信息的日志
-	rows, err := db.Query("SELECT deviceID, deviceName, deviceType, passWD, registerIP, superiorDeviceID, email, certAddress, certDomain, certAuthType, certKeyLen, DeviceHardwareFingerprint, created_at FROM devices")
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
+		log.Println("开始获取所有设备信息")
+	}
+
+	db := GetDB()
+	query := `SELECT 
+		deviceName, deviceType, passWD, deviceID, superiorDeviceID,
+		deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration,
+		certID, keyID, registerIP, email,
+		deviceHardwareFingerprint, anonymousUser, created_at
+	FROM devices`
+
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Printf("获取设备列表失败: %v\n", err)           // 记录错误信息
-		return nil, fmt.Errorf("获取设备列表失败: %w", err) // 返回详细错误信息
+		if cfg.DebugLevel == "true" {
+			log.Printf("查询设备信息失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("查询设备信息失败: %w", err)
 	}
 	defer rows.Close()
 
 	var devices []Device
 	for rows.Next() {
 		var device Device
-		var deviceHardwareFingerprint sql.NullString // 使用 sql.NullString 来处理可能为 NULL 的字段
-		err := rows.Scan(&device.DeviceID, &device.DeviceName, &device.DeviceType, &device.PassWD, &device.RegisterIP, &device.SuperiorDeviceID, &device.Email, &device.CertAddress, &device.CertDomain, &device.CertAuthType, &device.CertKeyLen, &deviceHardwareFingerprint, &device.CreatedAt)
+		var deviceHardwareFingerprint, anonymousUser sql.NullString
+		var certID, keyID sql.NullString
+		var deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration sql.NullInt64
+
+		err := rows.Scan(
+			&device.DeviceName, &device.DeviceType, &device.PassWD, &device.DeviceID, &device.SuperiorDeviceID,
+			&deviceStatus, &peakCPUUsage, &peakMemoryUsage, &onlineDuration,
+			&certID, &keyID, &device.RegisterIP, &device.Email,
+			&deviceHardwareFingerprint, &anonymousUser, &device.CreatedAt,
+		)
 		if err != nil {
-			log.Printf("扫描设备信息失败: %v\n", err)           // 记录错误信息
-			return nil, fmt.Errorf("扫描设备信息失败: %w", err) // 返回详细错误信息
+			if cfg.DebugLevel == "true" {
+				log.Printf("扫描设备信息失败: %v\n", err)
+			}
+			return nil, fmt.Errorf("扫描设备信息失败: %w", err)
 		}
-		// 将 DeviceHardwareFingerprint 赋值给设备结构体
+
+		// 处理可能为 NULL 的字段
 		if deviceHardwareFingerprint.Valid {
 			device.DeviceHardwareFingerprint = &deviceHardwareFingerprint.String
 		}
+		if anonymousUser.Valid {
+			device.AnonymousUser = &anonymousUser.String
+		}
+		if certID.Valid {
+			device.CertID = certID.String
+		}
+		if keyID.Valid {
+			device.KeyID = keyID.String
+		}
+		if deviceStatus.Valid {
+			device.DeviceStatus = int(deviceStatus.Int64)
+		}
+		if peakCPUUsage.Valid {
+			device.PeakCPUUsage = int(peakCPUUsage.Int64)
+		}
+		if peakMemoryUsage.Valid {
+			device.PeakMemoryUsage = int(peakMemoryUsage.Int64)
+		}
+		if onlineDuration.Valid {
+			device.OnlineDuration = int(onlineDuration.Int64)
+		}
+
 		devices = append(devices, device)
 	}
-	log.Printf("成功获取 %d 个设备信息\n", len(devices)) // 记录成功获取设备信息的日志
+
+	if err = rows.Err(); err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("遍历设备信息时发生错误: %v\n", err)
+		}
+		return nil, fmt.Errorf("遍历设备信息时发生错误: %w", err)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功获取 %d 个设备信息\n", len(devices))
+	}
+
 	return devices, nil
 }
 
-// UpdateUser 更新用户信息
+// UpdateUser 更新某个用户的除了用户ID以外的其他信息
 func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 	cfg := config.GetConfig()
 	if cfg.DebugLevel == "true" {
-		log.Printf("开始更新用户信息，用户ID: %d\n", userID) // 记录开始更新用户信息的日志
+		log.Printf("开始更新用户信息，用户ID: %d\n", userID)
 	}
 
 	// 获取当前用户信息
 	var existingUser User
-	err := db.QueryRow("SELECT userName, passWD, email, Status, PermissionMask, LastLoginTimeStamp, OffLineTimeStamp, LoginIP, IllegalLoginTimes, created_at FROM users WHERE userID = ?", userID).
-		Scan(&existingUser.UserName, &existingUser.PassWD, &existingUser.Email, &existingUser.Status, &existingUser.PermissionMask, &existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp, &existingUser.LoginIP, &existingUser.IllegalLoginTimes, &existingUser.CreatedAt)
+	query := `SELECT 
+		userName, passWD, email, userType, gatewayDeviceID,
+		status, certID, keyID, onlineDuration,
+		permissionMask, lastLoginTimeStamp, offLineTimeStamp,
+		loginIP, illegalLoginTimes, created_at 
+	FROM users WHERE userID = ?`
+
+	err := db.QueryRow(query, userID).Scan(
+		&existingUser.UserName, &existingUser.PassWD, &existingUser.Email,
+		&existingUser.UserType, &existingUser.GatewayDeviceID,
+		&existingUser.Status, &existingUser.CertID, &existingUser.KeyID,
+		&existingUser.OnlineDuration, &existingUser.PermissionMask,
+		&existingUser.LastLoginTimeStamp, &existingUser.OffLineTimeStamp,
+		&existingUser.LoginIP, &existingUser.IllegalLoginTimes,
+		&existingUser.CreatedAt,
+	)
 
 	if err != nil {
 		if cfg.DebugLevel == "true" {
-			log.Printf("获取用户信息失败: %v\n", err) // 记录错误信息
+			log.Printf("获取用户信息失败: %v\n", err)
 		}
-		return nil, fmt.Errorf("获取用户信息失败: %w", err) // 返回详细错误信息
+		return nil, fmt.Errorf("获取用户信息失败: %w", err)
 	}
 
 	// 构建更新 SQL 语句
 	updateFields := []string{}
 	updateValues := []interface{}{}
-	updatedFields := make(map[string]interface{}) // 用于存储更新的字段
+	updatedFields := make(map[string]interface{})
 
-	if user.UserName != "" {
+	// 检查并添加必填字段的更新
+	if user.UserName != "" && user.UserName != existingUser.UserName {
 		updateFields = append(updateFields, "userName=?")
 		updateValues = append(updateValues, user.UserName)
 		updatedFields["userName"] = user.UserName
 	}
-	if user.PassWD != "" {
+	if user.PassWD != "" && user.PassWD != existingUser.PassWD {
 		updateFields = append(updateFields, "passWD=?")
 		updateValues = append(updateValues, user.PassWD)
 		updatedFields["passWD"] = user.PassWD
 	}
-	if user.Email != "" {
+	if user.UserType != 0 && user.UserType != existingUser.UserType {
+		updateFields = append(updateFields, "userType=?")
+		updateValues = append(updateValues, user.UserType)
+		updatedFields["userType"] = user.UserType
+	}
+	if user.GatewayDeviceID != "" && user.GatewayDeviceID != existingUser.GatewayDeviceID {
+		updateFields = append(updateFields, "gatewayDeviceID=?")
+		updateValues = append(updateValues, user.GatewayDeviceID)
+		updatedFields["gatewayDeviceID"] = user.GatewayDeviceID
+	}
+
+	// 检查并添加可选字段的更新
+	if user.Email != "" && user.Email != existingUser.Email {
 		updateFields = append(updateFields, "email=?")
 		updateValues = append(updateValues, user.Email)
 		updatedFields["email"] = user.Email
 	}
-	if user.Status.Valid { // 只在 Status 有效时更新
-		updateFields = append(updateFields, "Status=?")
+	if user.Status.Valid {
+		updateFields = append(updateFields, "status=?")
 		updateValues = append(updateValues, user.Status.Int64)
 		updatedFields["status"] = user.Status.Int64
 	}
-	if user.PermissionMask.Valid { // 只在 PermissionMask 有效时更新
-		updateFields = append(updateFields, "PermissionMask=?")
+	if user.CertID != "" && user.CertID != existingUser.CertID {
+		updateFields = append(updateFields, "certID=?")
+		updateValues = append(updateValues, user.CertID)
+		updatedFields["certID"] = user.CertID
+	}
+	if user.KeyID != "" && user.KeyID != existingUser.KeyID {
+		updateFields = append(updateFields, "keyID=?")
+		updateValues = append(updateValues, user.KeyID)
+		updatedFields["keyID"] = user.KeyID
+	}
+	if user.OnlineDuration != 0 && user.OnlineDuration != existingUser.OnlineDuration {
+		updateFields = append(updateFields, "onlineDuration=?")
+		updateValues = append(updateValues, user.OnlineDuration)
+		updatedFields["onlineDuration"] = user.OnlineDuration
+	}
+	if user.PermissionMask.Valid {
+		updateFields = append(updateFields, "permissionMask=?")
 		updateValues = append(updateValues, user.PermissionMask.String)
 		updatedFields["permissionMask"] = user.PermissionMask.String
 	}
-	if user.LastLoginTimeStamp.Valid { // 只在 LastLoginTimeStamp 有效时更新
-		updateFields = append(updateFields, "LastLoginTimeStamp=?")
+	if user.LastLoginTimeStamp.Valid {
+		updateFields = append(updateFields, "lastLoginTimeStamp=?")
 		updateValues = append(updateValues, user.LastLoginTimeStamp.String)
 		updatedFields["lastLoginTimeStamp"] = user.LastLoginTimeStamp.String
 	}
-	if user.OffLineTimeStamp.Valid { // 只在 OffLineTimeStamp 有效时更新
-		updateFields = append(updateFields, "OffLineTimeStamp=?")
+	if user.OffLineTimeStamp.Valid {
+		updateFields = append(updateFields, "offLineTimeStamp=?")
 		updateValues = append(updateValues, user.OffLineTimeStamp.String)
 		updatedFields["offLineTimeStamp"] = user.OffLineTimeStamp.String
 	}
-	if user.LoginIP.Valid { // 只在 LoginIP 有效时更新
-		updateFields = append(updateFields, "LoginIP=?")
+	if user.LoginIP.Valid {
+		updateFields = append(updateFields, "loginIP=?")
 		updateValues = append(updateValues, user.LoginIP.String)
 		updatedFields["loginIP"] = user.LoginIP.String
 	}
-	if user.IllegalLoginTimes.Valid { // 只在 IllegalLoginTimes 有效时更新
-		updateFields = append(updateFields, "IllegalLoginTimes=?")
+	if user.IllegalLoginTimes.Valid {
+		updateFields = append(updateFields, "illegalLoginTimes=?")
 		updateValues = append(updateValues, user.IllegalLoginTimes.Int64)
 		updatedFields["illegalLoginTimes"] = user.IllegalLoginTimes.Int64
 	}
 
 	// 如果没有字段需要更新，直接返回
 	if len(updateFields) == 0 {
-		log.Println("没有字段需要更新") // 记录没有字段需要更新的日志
+		if cfg.DebugLevel == "true" {
+			log.Println("没有字段需要更新")
+		}
 		return nil, nil
 	}
 
@@ -280,118 +603,220 @@ func UpdateUser(userID int, user User) (map[string]interface{}, error) {
 	updateValues = append(updateValues, userID)
 
 	// 构建完整的 SQL 语句
-	updateSQL := "UPDATE users SET " + strings.Join(updateFields, ", ") + " WHERE userID=?"
-	_, err = db.Exec(updateSQL, updateValues...)
+	updateSQL := fmt.Sprintf("UPDATE users SET %s WHERE userID=?", strings.Join(updateFields, ", "))
+
+	// 执行更新
+	result, err := db.Exec(updateSQL, updateValues...)
 	if err != nil {
-		log.Printf("更新用户信息失败: %v\n", err)           // 记录错误信息
-		return nil, fmt.Errorf("更新用户信息失败: %w", err) // 返回详细错误信息
+		if cfg.DebugLevel == "true" {
+			log.Printf("更新用户信息失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("更新用户信息失败: %w", err)
 	}
 
-	log.Printf("成功更新用户信息，用户ID: %d\n", userID) // 记录成功更新用户信息的日志
-	// 返回更新的字段
+	// 检查更新结果
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("获取更新影响行数失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("获取更新影响行数失败: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		if cfg.DebugLevel == "true" {
+			log.Printf("未找到要更新的用户: %d\n", userID)
+		}
+		return nil, fmt.Errorf("未找到要更新的用户: %d", userID)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功更新用户信息，用户ID: %d\n", userID)
+	}
+
 	return updatedFields, nil
 }
 
-// UpdateDevice 更新设备信息
+// UpdateDevice 更新某个设备的除了设备ID以外的其他信息
 func UpdateDevice(deviceID string, device Device) (map[string]interface{}, error) {
 	cfg := config.GetConfig()
 	if cfg.DebugLevel == "true" {
-		log.Printf("开始更新设备信息，设备ID: %s\n", deviceID) // 记录开始更新设备信息的日志
+		log.Printf("开始更新设备信息: %s\n", deviceID)
 	}
 
-	// 获取当前设备信息
+	db := GetDB()
 	var existingDevice Device
-	var deviceHardwareFingerprint sql.NullString // 使用 sql.NullString 来处理可能为 NULL 的字段
-	err := db.QueryRow("SELECT deviceName, deviceType, passWD, registerIP, superiorDeviceID, email, certAddress, certDomain, certAuthType, certKeyLen, DeviceHardwareFingerprint, created_at FROM devices WHERE deviceID = ?", deviceID).
-		Scan(&existingDevice.DeviceName, &existingDevice.DeviceType, &existingDevice.PassWD, &existingDevice.RegisterIP, &existingDevice.SuperiorDeviceID, &existingDevice.Email, &existingDevice.CertAddress, &existingDevice.CertDomain, &existingDevice.CertAuthType, &existingDevice.CertKeyLen, &deviceHardwareFingerprint, &existingDevice.CreatedAt)
+	query := `SELECT 
+		deviceName, deviceType, passWD, superiorDeviceID,
+		deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration,
+		certID, keyID, registerIP, email,
+		deviceHardwareFingerprint, anonymousUser, created_at
+	FROM devices WHERE deviceID = ?`
+
+	var deviceHardwareFingerprint, anonymousUser sql.NullString
+	var certID, keyID sql.NullString
+	var deviceStatus, peakCPUUsage, peakMemoryUsage, onlineDuration sql.NullInt64
+
+	err := db.QueryRow(query, deviceID).Scan(
+		&existingDevice.DeviceName, &existingDevice.DeviceType, &existingDevice.PassWD, &existingDevice.SuperiorDeviceID,
+		&deviceStatus, &peakCPUUsage, &peakMemoryUsage, &onlineDuration,
+		&certID, &keyID, &existingDevice.RegisterIP, &existingDevice.Email,
+		&deviceHardwareFingerprint, &anonymousUser, &existingDevice.CreatedAt,
+	)
 
 	if err != nil {
 		if cfg.DebugLevel == "true" {
-			log.Printf("获取设备信息失败: %v\n", err) // 记录错误信息
+			log.Printf("查询设备信息失败: %v\n", err)
 		}
-		return nil, fmt.Errorf("获取设备信息失败: %w", err) // 返回详细错误信息
+		return nil, fmt.Errorf("查询设备信息失败: %w", err)
 	}
 
-	// 构建更新 SQL 语句
-	updateFields := []string{}
-	updateValues := []interface{}{}
-	updatedFields := make(map[string]interface{}) // 用于存储更新的字段
+	// 处理可能为 NULL 的字段
+	if deviceHardwareFingerprint.Valid {
+		existingDevice.DeviceHardwareFingerprint = &deviceHardwareFingerprint.String
+	}
+	if anonymousUser.Valid {
+		existingDevice.AnonymousUser = &anonymousUser.String
+	}
+	if certID.Valid {
+		existingDevice.CertID = certID.String
+	}
+	if keyID.Valid {
+		existingDevice.KeyID = keyID.String
+	}
+	if deviceStatus.Valid {
+		existingDevice.DeviceStatus = int(deviceStatus.Int64)
+	}
+	if peakCPUUsage.Valid {
+		existingDevice.PeakCPUUsage = int(peakCPUUsage.Int64)
+	}
+	if peakMemoryUsage.Valid {
+		existingDevice.PeakMemoryUsage = int(peakMemoryUsage.Int64)
+	}
+	if onlineDuration.Valid {
+		existingDevice.OnlineDuration = int(onlineDuration.Int64)
+	}
 
-	if device.DeviceName != "" {
+	// 构建更新语句
+	var updateFields []string
+	var updateValues []interface{}
+	updatedFields := make(map[string]interface{})
+
+	// 检查并添加必填字段的更新
+	if device.DeviceName != "" && device.DeviceName != existingDevice.DeviceName {
 		updateFields = append(updateFields, "deviceName=?")
 		updateValues = append(updateValues, device.DeviceName)
 		updatedFields["deviceName"] = device.DeviceName
 	}
-	if device.DeviceType != 0 {
+	if device.DeviceType != 0 && device.DeviceType != existingDevice.DeviceType {
 		updateFields = append(updateFields, "deviceType=?")
 		updateValues = append(updateValues, device.DeviceType)
 		updatedFields["deviceType"] = device.DeviceType
 	}
-	if device.PassWD != "" {
+	if device.PassWD != "" && device.PassWD != existingDevice.PassWD {
 		updateFields = append(updateFields, "passWD=?")
 		updateValues = append(updateValues, device.PassWD)
 		updatedFields["passWD"] = device.PassWD
 	}
-	if device.RegisterIP != "" {
-		updateFields = append(updateFields, "registerIP=?")
-		updateValues = append(updateValues, device.RegisterIP)
-		updatedFields["registerIP"] = device.RegisterIP
-	}
-	if device.SuperiorDeviceID != "" {
+	if device.SuperiorDeviceID != "" && device.SuperiorDeviceID != existingDevice.SuperiorDeviceID {
 		updateFields = append(updateFields, "superiorDeviceID=?")
 		updateValues = append(updateValues, device.SuperiorDeviceID)
 		updatedFields["superiorDeviceID"] = device.SuperiorDeviceID
 	}
-	if device.Email != "" {
+
+	// 检查并添加可选字段的更新
+	if device.DeviceStatus != 0 && device.DeviceStatus != existingDevice.DeviceStatus {
+		updateFields = append(updateFields, "deviceStatus=?")
+		updateValues = append(updateValues, device.DeviceStatus)
+		updatedFields["deviceStatus"] = device.DeviceStatus
+	}
+	if device.PeakCPUUsage != 0 && device.PeakCPUUsage != existingDevice.PeakCPUUsage {
+		updateFields = append(updateFields, "peakCPUUsage=?")
+		updateValues = append(updateValues, device.PeakCPUUsage)
+		updatedFields["peakCPUUsage"] = device.PeakCPUUsage
+	}
+	if device.PeakMemoryUsage != 0 && device.PeakMemoryUsage != existingDevice.PeakMemoryUsage {
+		updateFields = append(updateFields, "peakMemoryUsage=?")
+		updateValues = append(updateValues, device.PeakMemoryUsage)
+		updatedFields["peakMemoryUsage"] = device.PeakMemoryUsage
+	}
+	if device.OnlineDuration != 0 && device.OnlineDuration != existingDevice.OnlineDuration {
+		updateFields = append(updateFields, "onlineDuration=?")
+		updateValues = append(updateValues, device.OnlineDuration)
+		updatedFields["onlineDuration"] = device.OnlineDuration
+	}
+	if device.CertID != "" && device.CertID != existingDevice.CertID {
+		updateFields = append(updateFields, "certID=?")
+		updateValues = append(updateValues, device.CertID)
+		updatedFields["certID"] = device.CertID
+	}
+	if device.KeyID != "" && device.KeyID != existingDevice.KeyID {
+		updateFields = append(updateFields, "keyID=?")
+		updateValues = append(updateValues, device.KeyID)
+		updatedFields["keyID"] = device.KeyID
+	}
+	if device.RegisterIP != "" && device.RegisterIP != existingDevice.RegisterIP {
+		updateFields = append(updateFields, "registerIP=?")
+		updateValues = append(updateValues, device.RegisterIP)
+		updatedFields["registerIP"] = device.RegisterIP
+	}
+	if device.Email != "" && device.Email != existingDevice.Email {
 		updateFields = append(updateFields, "email=?")
 		updateValues = append(updateValues, device.Email)
 		updatedFields["email"] = device.Email
 	}
-	if device.CertAddress != "" {
-		updateFields = append(updateFields, "certAddress=?")
-		updateValues = append(updateValues, device.CertAddress)
-		updatedFields["certAddress"] = device.CertAddress
+	if device.DeviceHardwareFingerprint != nil {
+		updateFields = append(updateFields, "deviceHardwareFingerprint=?")
+		updateValues = append(updateValues, *device.DeviceHardwareFingerprint)
+		updatedFields["deviceHardwareFingerprint"] = *device.DeviceHardwareFingerprint
 	}
-	if device.CertDomain != "" {
-		updateFields = append(updateFields, "certDomain=?")
-		updateValues = append(updateValues, device.CertDomain)
-		updatedFields["certDomain"] = device.CertDomain
-	}
-	if device.CertAuthType != 0 {
-		updateFields = append(updateFields, "certAuthType=?")
-		updateValues = append(updateValues, device.CertAuthType)
-		updatedFields["certAuthType"] = device.CertAuthType
-	}
-	if device.CertKeyLen != 0 {
-		updateFields = append(updateFields, "certKeyLen=?")
-		updateValues = append(updateValues, device.CertKeyLen)
-		updatedFields["certKeyLen"] = device.CertKeyLen
-	}
-	if deviceHardwareFingerprint.Valid {
-		updateFields = append(updateFields, "DeviceHardwareFingerprint=?")
-		updateValues = append(updateValues, deviceHardwareFingerprint.String)
-		updatedFields["deviceHardwareFingerprint"] = deviceHardwareFingerprint.String
+	if device.AnonymousUser != nil {
+		updateFields = append(updateFields, "anonymousUser=?")
+		updateValues = append(updateValues, *device.AnonymousUser)
+		updatedFields["anonymousUser"] = *device.AnonymousUser
 	}
 
-	// 如果没有字段需要更新，直接返回
+	// 如果没有需要更新的字段，直接返回
 	if len(updateFields) == 0 {
-		log.Println("没有字段需要更新") // 记录没有字段需要更新的日志
-		return nil, nil
+		if cfg.DebugLevel == "true" {
+			log.Println("没有需要更新的字段")
+		}
+		return updatedFields, nil
 	}
 
-	// 添加 deviceID 到更新值的最后
+	// 构建完整的更新语句
 	updateValues = append(updateValues, deviceID)
+	query = fmt.Sprintf("UPDATE devices SET %s WHERE deviceID=?", strings.Join(updateFields, ", "))
 
-	// 构建完整的 SQL 语句
-	updateSQL := "UPDATE devices SET " + strings.Join(updateFields, ", ") + " WHERE deviceID=?"
-	_, err = db.Exec(updateSQL, updateValues...)
+	// 执行更新
+	result, err := db.Exec(query, updateValues...)
 	if err != nil {
-		log.Printf("更新设备信息失败: %v\n", err)           // 记录错误信息
-		return nil, fmt.Errorf("更新设备信息失败: %w", err) // 返回详细错误信息
+		if cfg.DebugLevel == "true" {
+			log.Printf("更新设备信息失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("更新设备信息失败: %w", err)
 	}
 
-	log.Printf("成功更新设备信息，设备ID: %s\n", deviceID) // 记录成功更新设备信息的日志
-	// 返回更新的字段
+	// 检查更新结果
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("获取更新影响行数失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("获取更新影响行数失败: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		if cfg.DebugLevel == "true" {
+			log.Printf("未找到要更新的设备: %s\n", deviceID)
+		}
+		return nil, fmt.Errorf("未找到要更新的设备: %s", deviceID)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Printf("成功更新设备信息: %s\n", deviceID)
+	}
+
 	return updatedFields, nil
 }
 

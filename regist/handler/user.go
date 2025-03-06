@@ -14,21 +14,13 @@ import (
 
 // User 结构体定义用户信息
 type User struct {
-	UserName           string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制
-	PassWD             string `json:"passWD"`                                   // 密码，长度限制
-	Email              string `json:"email"`                                    // 邮箱，格式校验
-	UserID             int    `json:"userID" binding:"required"`                // 用户唯一标识，必填
-	CertAddress        string `json:"certAddress"`                              // 证书地址
-	CertDomain         string `json:"certDomain"`                               // 证书域名
-	CertAuthType       int    `json:"certAuthType"`                             // 证书认证类型
-	CertKeyLen         int    `json:"certKeyLen"`                               // 证书密钥长度
-	SecuLevel          int    `json:"secuLevel"`                                // 安全级别
-	Status             int    `json:"status"`                                   // 账户状态
-	PermissionMask     string `json:"permissionMask"`                           // 权限位掩码
-	LastLoginTimeStamp string `json:"lastLoginTimeStamp"`                       // 登录时间戳
-	OffLineTimeStamp   string `json:"offLineTimeStamp"`                         // 离线时间戳
-	LoginIP            string `json:"loginIP"`                                  // 用户登录 IP
-	IllegalLoginTimes  int    `json:"illegalLoginTimes"`                        // 用户本次的非法登录次数
+	UserName        string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制，注册时需要
+	PassWD          string `json:"passWD" binding:"required,min=8"`          // 密码，必填，长度限制，注册时需要
+	UserID          int    `json:"userID" binding:"required"`                // 用户唯一标识，必填，注册时需要
+	UserType        int    `json:"userType" binding:"required"`              // 用户类型，注册时需要
+	GatewayDeviceID string `json:"gatewayDeviceID" binding:"required"`       // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
+	CertID          string `json:"certID"`                                   // 证书ID，允许为 NULL
+	KeyID           string `json:"keyID"`                                    // 密钥ID，允许为 NULL
 }
 
 // RegisterUser 处理用户注册请求
@@ -68,8 +60,8 @@ func RegisterUser(c *gin.Context) {
 
 	// 插入用户信息到数据库
 	db := model.GetDB() // 获取数据库连接
-	_, err = db.Exec("INSERT INTO users (userName, passWD, email, userID, certAddress, certDomain, certAuthType, certKeyLen, secuLevel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		user.UserName, user.PassWD, user.Email, user.UserID, user.CertAddress, user.CertDomain, user.CertAuthType, user.CertKeyLen, user.SecuLevel)
+	_, err = db.Exec("INSERT INTO users (userName, passWD, userID, userType, gatewayDeviceID, certID, keyID) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		user.UserName, user.PassWD, user.UserID, user.UserType, user.GatewayDeviceID, user.CertID, user.KeyID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建用户"}) // 返回创建用户失败信息
@@ -84,7 +76,7 @@ func RegisterUser(c *gin.Context) {
 		"message": "User created", // 返回用户创建成功信息
 		"data": gin.H{
 			"userName":   user.UserName,
-			"email":      user.Email,
+			"userID":     user.UserID,
 			"created_at": createdAt, // 返回实际创建时间
 		},
 	})
