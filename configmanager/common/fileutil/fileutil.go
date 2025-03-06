@@ -221,21 +221,27 @@ func IsFileExists(path string) bool {
 }
 
 // WriteFile 写入文件
-func WriteFile(path string, data []byte, perm os.FileMode) error {
+func WriteFile(filePath string, data []byte, perm os.FileMode) error {
 	cfg := config.GetConfig()
 	if cfg.DebugLevel == "true" {
-		log.Printf("写入文件: %s, 数据长度: %d\n", path, len(data))
+		log.Printf("开始写入文件: %s, 数据长度: %d\n", filePath, len(data))
 	}
 
 	// 确保目录存在
-	dir := filepath.Dir(path)
-	if err := EnsureDir(dir); err != nil {
-		return err
+	dir := filepath.Dir(filePath)
+	if cfg.DebugLevel == "true" {
+		log.Printf("创建目录: %s\n", dir)
+	}
+
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("创建目录失败: %v\n", err)
+		}
+		return fmt.Errorf("创建目录失败: %w", err)
 	}
 
 	// 写入文件
-	err := os.WriteFile(path, data, perm)
-	if err != nil {
+	if err := os.WriteFile(filePath, data, perm); err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("写入文件失败: %v\n", err)
 		}
@@ -243,7 +249,7 @@ func WriteFile(path string, data []byte, perm os.FileMode) error {
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Printf("文件写入完成: %s\n", path)
+		log.Printf("文件写入完成: %s\n", filePath)
 	}
 	return nil
 }

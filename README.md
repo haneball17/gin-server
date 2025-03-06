@@ -20,6 +20,11 @@
   - 文件变更监控
   - 加密传输
   - 多存储方式支持（Gitee/FTP）
+- 告警管理
+  - 多级别告警（INFO/WARNING/ERROR/FATAL）
+  - 多类型告警支持
+  - 可扩展的告警处理机制
+  - 告警日志记录
 
 ## API 接口说明
 
@@ -367,3 +372,198 @@ gin-server/
 ## 许可证
 
 [MIT License](LICENSE)
+
+## 告警模块说明
+
+### 告警级别
+
+系统支持四个告警级别：
+
+- INFO：信息级别，用于记录普通操作信息
+- WARNING：警告级别，用于提示潜在问题
+- ERROR：错误级别，用于记录严重问题
+- FATAL：致命级别，用于记录可能导致系统崩溃的问题
+
+### 告警类型
+
+系统支持以下告警类型：
+
+- LOG_GENERATE：日志生成相关告警
+- LOG_ENCRYPT：日志加密相关告警
+- LOG_UPLOAD：日志上传相关告警
+- STRATEGY_SYNC：策略同步相关告警
+- STRATEGY_APPLY：策略应用相关告警
+
+### 告警信息结构
+
+每条告警包含以下信息：
+
+```json
+{
+  "level": "string",      // 告警级别
+  "type": "string",       // 告警类型
+  "message": "string",    // 告警消息
+  "error": "string",      // 错误信息（可选）
+  "retryCount": int,      // 重试次数
+  "timestamp": "string",  // 时间戳
+  "module": "string"      // 告警模块
+}
+```
+
+### 使用示例
+
+```go
+// 创建告警器
+alerter := alert.NewLogAlerter()
+
+// 创建告警信息
+alertInfo := &alert.Alert{
+    Level:      alert.AlertLevelInfo,
+    Type:       alert.AlertTypeLogGenerate,
+    Message:    "日志生成成功",
+    Error:      nil,
+    RetryCount: 0,
+    Timestamp:  time.Now(),
+    Module:     "LogModule",
+}
+
+// 发送告警
+err := alerter.Alert(alertInfo)
+```
+
+## 日志生成模块说明
+
+### 日志生成周期
+
+系统默认每5分钟生成一次日志文件，记录最近5分钟内的系统运行状态，包括：
+- 设备状态（CPU使用率、内存使用率、在线时长等）
+- 用户行为（文件传输、消息发送等）
+- 安全事件
+- 故障事件
+
+### 日志文件结构
+
+日志文件（log.json）包含以下主要字段：
+
+```json
+{
+  "timeRange": {
+    "startTime": "2024-03-07T10:00:00Z",  // 统计起始时间
+    "duration": 300                        // 统计时长（秒）
+  },
+  "securityEvents": {
+    "events": [
+      {
+        "eventId": 1001,                   // 事件ID
+        "deviceId": "SEC00000001",         // 设备ID
+        "eventTime": "2024-03-07T10:02:00Z", // 事件发生时间
+        "eventType": 1,                    // 事件类型（1:安全事件）
+        "eventCode": "SEC_001",            // 事件代码
+        "eventDesc": "异常登录尝试",         // 事件描述
+        "createdAt": "2024-03-07T10:02:01Z" // 记录创建时间
+      }
+    ]
+  },
+  "performanceEvents": {
+    "securityDevices": [
+      {
+        "deviceId": "SEC00000001",         // 安全接入管理设备ID
+        "cpuUsage": 45,                    // CPU使用率峰值(%)
+        "memoryUsage": 60,                 // 内存使用率峰值(%)
+        "onlineDuration": 3600,            // 在线时长(秒)
+        "status": 1,                       // 设备状态(1:在线,2:离线)
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",     // 网关设备ID
+            "cpuUsage": 30,                // CPU使用率峰值(%)
+            "memoryUsage": 40,             // 内存使用率峰值(%)
+            "onlineDuration": 3600,        // 在线时长(秒)
+            "status": 1,                   // 设备状态
+            "users": [
+              {
+                "userId": 10001,           // 用户ID
+                "status": 1,               // 用户状态(1:在线,2:离线)
+                "onlineDuration": 1800,    // 在线时长(秒)
+                "behaviors": [
+                  {
+                    "time": "2024-03-07T10:01:00Z", // 行为发生时间
+                    "type": 1,             // 行为类型(1:发送,2:接收)
+                    "dataType": 1,         // 数据类型(1:文件,2:消息)
+                    "dataSize": 1024       // 数据大小(字节)
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "faultEvents": {
+    "events": [
+      {
+        "eventId": 2001,                   // 事件ID
+        "deviceId": "GWA00000001",         // 设备ID
+        "eventTime": "2024-03-07T10:03:00Z", // 事件发生时间
+        "eventType": 2,                    // 事件类型（2:故障事件）
+        "eventCode": "FAULT_001",          // 事件代码
+        "eventDesc": "设备离线",            // 事件描述
+        "createdAt": "2024-03-07T10:03:01Z" // 记录创建时间
+      }
+    ]
+  }
+}
+```
+
+### 使用示例
+
+```go
+// 创建日志管理器
+logManager := log.NewLogManager(cfg, db)
+
+// 启动日志管理器（自动定时生成）
+err := logManager.Start()
+if err != nil {
+    log.Fatalf("启动日志管理器失败: %v", err)
+}
+
+// 手动生成日志
+err = logManager.GenerateLog()
+if err != nil {
+    log.Printf("生成日志失败: %v", err)
+}
+
+// 停止日志管理器
+err = logManager.Stop()
+if err != nil {
+    log.Printf("停止日志管理器失败: %v", err)
+}
+```
+
+### 日志文件存储
+
+日志文件按照时间戳命名的目录存储，格式为：
+```
+logs/
+├── 20240307100000/
+│   └── log.json
+├── 20240307100500/
+│   └── log.json
+└── 20240307101000/
+    └── log.json
+```
+
+### 注意事项
+
+1. 时间范围
+   - 每个日志文件记录5分钟内的数据
+   - 时间戳使用UTC格式
+
+2. 数据完整性
+   - 确保数据库中的时间戳字段准确
+   - 用户行为和事件时间应在统计时间范围内
+
+3. 性能考虑
+   - 合理设置生成间隔
+   - 注意日志文件大小
+   - 定期清理历史日志

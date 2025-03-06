@@ -20,7 +20,7 @@ type User struct {
 	UserType        int    `json:"userType"`        // 用户类型，注册时需要
 	GatewayDeviceID string `json:"gatewayDeviceID"` // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
 
-	Status         sql.NullInt64 `json:"status"`         // 账户状态，允许为 NULL，上报时需要
+	Status         sql.NullInt64 `json:"status"`         // 设备状态，1代表在线，2代表离线，3代表冻结，4代表注销，上报时需要,允许为 NULL
 	OnlineDuration int           `json:"onlineDuration"` // 在线时长，上报时需要，允许为 NULL
 
 	CertID             string         `json:"certID"`             // 证书ID，允许为 NULL

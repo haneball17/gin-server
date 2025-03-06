@@ -326,6 +326,11 @@ func GetConfig() *Config {
 	return globalConfig
 }
 
+// SetConfig 设置全局配置
+func SetConfig(cfg *Config) {
+	globalConfig = cfg
+}
+
 // getEnv 获取环境变量
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
