@@ -44,7 +44,7 @@ func InitRadiusDB() error {
 	}
 
 	// 构建DSN，添加parseTime=true参数
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local&allowNativePasswords=true",
 		cfg.RadiusDBUser,
 		cfg.RadiusDBPassword,
 		cfg.RadiusDBHost,
@@ -68,17 +68,17 @@ func InitRadiusDB() error {
 	createRadpostauthTable := `
 	CREATE TABLE IF NOT EXISTS radpostauth (
 		id INT PRIMARY KEY AUTO_INCREMENT,
-		username VARCHAR(64) NOT NULL DEFAULT '',
+		username VARCHAR(64) NOT NULL DEFAULT '' COLLATE utf8mb4_unicode_ci,
 		pass VARCHAR(64) NOT NULL DEFAULT '',
-		reply VARCHAR(64) NOT NULL DEFAULT '',
-		authdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		class VARCHAR(64) DEFAULT NULL,
-		calledstationid VARCHAR(50) DEFAULT NULL,
-		callingstationid VARCHAR(50) DEFAULT NULL,
+		reply VARCHAR(64) NOT NULL DEFAULT '' COLLATE utf8mb4_unicode_ci,
+		authdate TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		class VARCHAR(64) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
+		calledstationid VARCHAR(50) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
+		callingstationid VARCHAR(50) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
 		INDEX idx_username (username),
 		INDEX idx_authdate (authdate),
 		INDEX idx_reply (reply)
-	);`
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
 	if cfg.DebugLevel == "true" {
 		log.Println("检查并创建radpostauth表")

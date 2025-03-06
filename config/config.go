@@ -82,6 +82,10 @@ type ConfigManagerConfig struct {
 	// Storage 存储配置
 	// 配置远程存储方式和参数
 	Storage StorageConfig
+
+	// Compress 压缩配置
+	// 配置文件压缩和解压参数
+	Compress CompressConfig
 }
 
 // LogManagerConfig 日志管理配置结构体
@@ -127,6 +131,29 @@ type StorageConfig struct {
 	// FTP FTP配置
 	// 当Type为"ftp"时使用
 	FTP FTPConfig
+}
+
+// CompressConfig 压缩配置结构体
+type CompressConfig struct {
+	// Format 压缩格式
+	// 可选值: "tar.gz" - tar.gz格式
+	Format string
+
+	// CompressionLevel 压缩级别
+	// 可选值: 1-9，1最快但压缩率最低，9最慢但压缩率最高
+	CompressionLevel int
+
+	// BufferSize 缓冲区大小（字节）
+	// 建议值: 32768 (32KB)
+	BufferSize int
+
+	// IncludePatterns 包含的文件模式
+	// 例如: ["*.json", "*.txt"]
+	IncludePatterns []string
+
+	// ExcludePatterns 排除的文件模式
+	// 例如: ["*.tmp", "*.bak"]
+	ExcludePatterns []string
 }
 
 // GiteeConfig Gitee配置结构体
@@ -214,7 +241,7 @@ func InitConfig() {
 
 		// Radius数据库配置 (默认与主数据库相同的连接信息，但不同的数据库名)
 		RadiusDBUser:     getEnv("RADIUS_DB_USER", getEnv("DB_USER", "gin_user")),
-		RadiusDBPassword: getEnv("RADIUS_DB_PASSWORD", getEnv("DB_PASSWORD", "your_password")),
+		RadiusDBPassword: getEnv("RADIUS_DB_PASSWORD", getEnv("DB_PASSWORD", "P@ssw0rd123!")),
 		RadiusDBHost:     getEnv("RADIUS_DB_HOST", getEnv("DB_HOST", "127.0.0.1")),
 		RadiusDBPort:     getEnv("RADIUS_DB_PORT", getEnv("DB_PORT", "3306")),
 		RadiusDBName:     getEnv("RADIUS_DB_NAME", "radius"),
@@ -260,6 +287,13 @@ func InitConfig() {
 					Username: getEnv("FTP_USERNAME", ""),
 					Password: getEnv("FTP_PASSWORD", ""),
 				},
+			},
+			Compress: CompressConfig{
+				Format:           getEnv("COMPRESS_FORMAT", "tar.gz"),
+				CompressionLevel: getEnvInt("COMPRESS_LEVEL", 6),
+				BufferSize:       getEnvInt("COMPRESS_BUFFER_SIZE", 32*1024),
+				IncludePatterns:  []string{},
+				ExcludePatterns:  []string{},
 			},
 		},
 	}

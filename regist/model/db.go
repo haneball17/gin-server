@@ -56,7 +56,7 @@ func InitDB() {
 
 	var err error
 	// 连接数据库，DSN 格式为 "用户名:密码@tcp(主机:端口)/数据库名"
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local&allowNativePasswords=true",
 		cfg.DBUser,
 		cfg.DBPassword,
 		cfg.DBHost,
@@ -81,23 +81,26 @@ func InitDB() {
 	createUsersTable := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INT AUTO_INCREMENT PRIMARY KEY,
-		userName VARCHAR(20) NOT NULL,
-		passWD VARCHAR(255) NOT NULL,
-		email VARCHAR(32),
+		userName VARCHAR(20) NOT NULL COLLATE utf8mb4_unicode_ci,
+		passWD VARCHAR(255) ,
+		email VARCHAR(32) COLLATE utf8mb4_unicode_ci,
 		userID INT NOT NULL,
-		certAddress VARCHAR(32) NOT NULL,
-		certDomain VARCHAR(32) NOT NULL,
-		certAuthType INT NOT NULL,
-		certKeyLen INT NOT NULL,
-		secuLevel INT NOT NULL,
+		certAddress VARCHAR(32) ,
+		certDomain VARCHAR(32) ,
+		certAuthType INT ,
+		certKeyLen INT ,
+		secuLevel INT ,
 		status INT,
 		permissionMask CHAR(8),
-		lastLoginTimeStamp DATETIME,
-		offLineTimeStamp DATETIME,
+		lastLoginTimeStamp DATETIME(3),
+		offLineTimeStamp DATETIME(3),
 		loginIP CHAR(24),
 		illegalLoginTimes INT,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_userid (userID),
+		INDEX idx_username (userName),
+		INDEX idx_email (email)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
 	_, err = db.Exec(createUsersTable)
 	if err != nil {
@@ -108,20 +111,23 @@ func InitDB() {
 	createDevicesTable := `
 	CREATE TABLE IF NOT EXISTS devices (
 		id INT AUTO_INCREMENT PRIMARY KEY,
-		deviceName VARCHAR(50) NOT NULL,
-		deviceType INT NOT NULL,
-		passWD VARCHAR(255) NOT NULL,
-		deviceID CHAR(12) NOT NULL,
-		registerIP VARCHAR(24) NOT NULL,
-		superiorDeviceID CHAR(12) NOT NULL,
-		email VARCHAR(32),
-		certAddress VARCHAR(32) NOT NULL,
-		certDomain VARCHAR(32) NOT NULL,
-		certAuthType INT NOT NULL,
-		certKeyLen INT NOT NULL,
+		deviceName VARCHAR(50) COLLATE utf8mb4_unicode_ci,
+		deviceType INT ,
+		passWD VARCHAR(255) ,
+		deviceID CHAR(12) ,
+		registerIP VARCHAR(24) ,
+		superiorDeviceID CHAR(12) ,
+		email VARCHAR(32) COLLATE utf8mb4_unicode_ci,
+		certAddress VARCHAR(32) ,
+		certDomain VARCHAR(32) ,
+		certAuthType INT ,
+		certKeyLen INT ,
 		deviceHardwareFingerprint CHAR(128),
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`
+		created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_deviceid (deviceID),
+		INDEX idx_devicename (deviceName),
+		INDEX idx_superiordeviceid (superiorDeviceID)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
 	_, err = db.Exec(createDevicesTable)
 	if err != nil {
