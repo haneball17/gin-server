@@ -11,26 +11,23 @@ import (
 
 // AuthRecord 认证记录结构体
 type AuthRecord struct {
-	ID               int       `json:"id"`
-	Username         string    `json:"username"`
-	Pass             string    `json:"pass"`
-	Reply            string    `json:"reply"`
-	AuthDate         time.Time `json:"authdate"`
-	Class            string    `json:"class"`
-	CalledStationID  string    `json:"calledstationid"`
-	CallingStationID string    `json:"callingstationid"`
+	ID       int       `json:"id"`
+	Username string    `json:"username"`
+	Pass     string    `json:"pass"`
+	Reply    string    `json:"reply"`
+	AuthDate time.Time `json:"authdate"`
+	Class    string    `json:"class"`
 }
 
 // AuthRecordQuery 查询条件结构体
 type AuthRecordQuery struct {
-	Username         string `form:"username"`
-	Reply            string `form:"reply"`
-	StartDate        string `form:"start_date"`
-	EndDate          string `form:"end_date"`
-	Page             int    `form:"page,default=1"`
-	PageSize         int    `form:"page_size,default=10"`
-	CalledStationID  string `form:"calledstationid"`
-	CallingStationID string `form:"callingstationid"`
+	Username  string `form:"username"`
+	Reply     string `form:"reply"`
+	StartDate string `form:"start_date"`
+	EndDate   string `form:"end_date"`
+	Page      int    `form:"page,default=1"`
+	PageSize  int    `form:"page_size,default=10"`
+	Class     string `form:"class"`
 }
 
 // 全局变量，存储radius数据库连接
@@ -67,17 +64,14 @@ func InitRadiusDB() error {
 	// 创建radpostauth表
 	createRadpostauthTable := `
 	CREATE TABLE IF NOT EXISTS radpostauth (
-		id INT PRIMARY KEY AUTO_INCREMENT,
-		username VARCHAR(64) NOT NULL DEFAULT '' COLLATE utf8mb4_unicode_ci,
-		pass VARCHAR(64) NOT NULL DEFAULT '',
-		reply VARCHAR(64) NOT NULL DEFAULT '' COLLATE utf8mb4_unicode_ci,
-		authdate TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
-		class VARCHAR(64) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
-		calledstationid VARCHAR(50) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
-		callingstationid VARCHAR(50) DEFAULT NULL COLLATE utf8mb4_unicode_ci,
+		id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		username VARCHAR(64) NOT NULL,
+		pass VARCHAR(64) NOT NULL,
+		reply VARCHAR(32) NOT NULL,
+		authdate TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+		class VARCHAR(64) NULL DEFAULT NULL,
 		INDEX idx_username (username),
-		INDEX idx_authdate (authdate),
-		INDEX idx_reply (reply)
+		INDEX idx_class (class)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
 	if cfg.DebugLevel == "true" {
@@ -132,14 +126,9 @@ func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
 		args = append(args, query.EndDate+" 23:59:59")
 	}
 
-	if query.CalledStationID != "" {
-		whereClause += " AND calledstationid LIKE ?"
-		args = append(args, "%"+query.CalledStationID+"%")
-	}
-
-	if query.CallingStationID != "" {
-		whereClause += " AND callingstationid LIKE ?"
-		args = append(args, "%"+query.CallingStationID+"%")
+	if query.Class != "" {
+		whereClause += " AND class = ?"
+		args = append(args, query.Class)
 	}
 
 	// 查询总记录数
@@ -155,7 +144,7 @@ func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
 	offset := (query.Page - 1) * query.PageSize
 
 	// 查询记录
-	querySQL := fmt.Sprintf("SELECT id, username, pass, reply, authdate, class, calledstationid, callingstationid FROM radpostauth %s ORDER BY authdate DESC LIMIT ? OFFSET ?", whereClause)
+	querySQL := fmt.Sprintf("SELECT id, username, pass, reply, authdate, class FROM radpostauth %s ORDER BY authdate DESC LIMIT ? OFFSET ?", whereClause)
 	args = append(args, query.PageSize, offset)
 
 	if cfg.DebugLevel == "true" {
@@ -180,8 +169,6 @@ func GetAuthRecords(query AuthRecordQuery) ([]AuthRecord, int, error) {
 			&record.Reply,
 			&record.AuthDate,
 			&class,
-			&record.CalledStationID,
-			&record.CallingStationID,
 		)
 		if err != nil {
 			log.Printf("扫描认证记录失败: %v\n", err)

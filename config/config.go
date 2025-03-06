@@ -234,7 +234,7 @@ func InitConfig() {
 
 		// 主数据库配置
 		DBUser:     getEnv("DB_USER", "gin_user"),
-		DBPassword: getEnv("DB_PASSWORD", "your_password"),
+		DBPassword: getEnv("DB_PASSWORD", "P@ssw0rd123!"),
 		DBHost:     getEnv("DB_HOST", "127.0.0.1"),
 		DBPort:     getEnv("DB_PORT", "3306"),
 		DBName:     getEnv("DB_NAME", "gin_server"),
