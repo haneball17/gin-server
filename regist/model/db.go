@@ -68,6 +68,16 @@ type Device struct {
 	CreatedAt string `json:"created_at"` // 创建时间
 }
 
+// Cert 结构体定义证书信息
+type Cert struct {
+	ID         int       `json:"id"`
+	EntityType string    `json:"entity_type"` // 实体类型：user或device
+	EntityID   string    `json:"entity_id"`   // 用户ID或设备ID
+	CertPath   string    `json:"cert_path"`   // 证书文件路径
+	KeyPath    string    `json:"key_path"`    // 密钥文件路径
+	UploadTime time.Time `json:"upload_time"` // 上传时间
+}
+
 var db *sql.DB // 声明数据库连接变量
 
 // ResetDB 删除并重新创建数据库表
@@ -195,6 +205,11 @@ func InitDB() {
 	if err := ensureTablesExist(); err != nil {
 		log.Fatal("确保数据库表存在时发生错误:", err)
 	}
+
+	// 确保证书目录存在
+	if err := EnsureCertDirsExist(); err != nil {
+		log.Fatal("确保证书目录存在时发生错误:", err)
+	}
 }
 
 // ensureTablesExist 确保必要的表存在
@@ -272,6 +287,18 @@ func ensureTablesExist() error {
 		FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
 
+	// 创建证书表
+	createCertsTable := `
+	CREATE TABLE IF NOT EXISTS certs (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		entity_type VARCHAR(10) NOT NULL COMMENT '实体类型：user或device',
+		entity_id VARCHAR(50) NOT NULL COMMENT '用户ID或设备ID',
+		cert_path VARCHAR(255) NULL COMMENT '证书文件路径',
+		key_path VARCHAR(255) NULL COMMENT '密钥文件路径',
+		upload_time TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+		INDEX idx_entity (entity_type, entity_id)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+
 	// 先创建设备表
 	if _, err := db.Exec(createDevicesTable); err != nil {
 		return fmt.Errorf("创建设备表失败: %w", err)
@@ -282,14 +309,114 @@ func ensureTablesExist() error {
 		return fmt.Errorf("创建用户表失败: %w", err)
 	}
 
-	// 最后创建用户行为表
+	// 然后创建用户行为表
 	if _, err := db.Exec(createUserBehaviorTable); err != nil {
 		return fmt.Errorf("创建用户行为表失败: %w", err)
+	}
+
+	// 最后创建证书表
+	if _, err := db.Exec(createCertsTable); err != nil {
+		return fmt.Errorf("创建证书表失败: %w", err)
+	}
+
+	// 检查证书表结构
+	if err := checkCertsTableStructure(); err != nil {
+		return err
 	}
 
 	if cfg.DebugLevel == "true" {
 		log.Println("数据库表检查完成！")
 	}
+	return nil
+}
+
+// 添加检查和更新证书表结构的函数
+func checkCertsTableStructure() error {
+	cfg := config.GetConfig()
+
+	// 获取表结构信息
+	rows, err := db.Query("DESCRIBE certs")
+	if err != nil {
+		return fmt.Errorf("获取证书表结构失败: %w", err)
+	}
+	defer rows.Close()
+
+	// 存储当前表结构
+	existingColumns := make(map[string]bool)
+	for rows.Next() {
+		var field, fieldType, null, key, defaultValue, extra sql.NullString
+		err := rows.Scan(&field, &fieldType, &null, &key, &defaultValue, &extra)
+		if err != nil {
+			return fmt.Errorf("扫描表结构信息失败: %w", err)
+		}
+		if field.Valid {
+			existingColumns[field.String] = true
+		}
+	}
+
+	// 定义应该存在的列和它们的定义
+	expectedColumns := map[string]string{
+		"id":          "INT AUTO_INCREMENT PRIMARY KEY",
+		"entity_type": "VARCHAR(10) NOT NULL",
+		"entity_id":   "VARCHAR(50) NOT NULL",
+		"cert_path":   "VARCHAR(255) NULL",
+		"key_path":    "VARCHAR(255) NULL",
+		"upload_time": "TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)",
+	}
+
+	// 检查缺失的列并添加
+	for column, definition := range expectedColumns {
+		if !existingColumns[column] {
+			if cfg.DebugLevel == "true" {
+				log.Printf("证书表缺少列 %s，正在添加...\n", column)
+			}
+
+			// 添加缺失的列
+			alterSQL := fmt.Sprintf("ALTER TABLE certs ADD COLUMN %s %s", column, definition)
+			if _, err := db.Exec(alterSQL); err != nil {
+				return fmt.Errorf("添加列 %s 失败: %w", column, err)
+			}
+
+			if cfg.DebugLevel == "true" {
+				log.Printf("成功添加列 %s\n", column)
+			}
+		}
+	}
+
+	// 检查索引
+	rows, err = db.Query("SHOW INDEX FROM certs")
+	if err != nil {
+		return fmt.Errorf("获取证书表索引信息失败: %w", err)
+	}
+	defer rows.Close()
+
+	hasEntityIndex := false
+	for rows.Next() {
+		var table, nonUnique, keyName, seqInIndex, columnName, collation, cardinality, subPart, packed, null, indexType, comment, indexComment, visible, expression sql.NullString
+		err := rows.Scan(&table, &nonUnique, &keyName, &seqInIndex, &columnName, &collation, &cardinality, &subPart, &packed, &null, &indexType, &comment, &indexComment, &visible, &expression)
+		if err != nil {
+			return fmt.Errorf("扫描索引信息失败: %w", err)
+		}
+		if keyName.Valid && keyName.String == "idx_entity" {
+			hasEntityIndex = true
+		}
+	}
+
+	// 添加缺失的索引
+	if !hasEntityIndex {
+		if cfg.DebugLevel == "true" {
+			log.Println("证书表缺少索引 idx_entity，正在添加...")
+		}
+
+		if _, err := db.Exec("CREATE INDEX idx_entity ON certs(entity_type, entity_id)"); err != nil {
+			return fmt.Errorf("添加索引 idx_entity 失败: %w", err)
+		}
+
+		if cfg.DebugLevel == "true" {
+			log.Println("成功添加索引 idx_entity")
+		}
+	}
+
 	return nil
 }
 

@@ -31,4 +31,16 @@ func SetupRouter(r *gin.Engine) {
 	r.POST("/regist/devices", handler.RegisterDevice)  // 注册设备接口
 	r.GET("/search/devices", handler.GetDevices)       // 获取所有设备接口
 	r.PUT("/update/devices/:id", handler.UpdateDevice) // 更新设备接口
+
+	// 证书管理路由
+	// 用户证书绑定
+	r.POST("/bind/users/:id/cert", handler.BindUserCert) // 用户证书绑定接口
+	r.POST("/bind/users/:id/key", handler.BindUserKey)   // 用户密钥绑定接口
+
+	// 设备证书绑定
+	r.POST("/bind/devices/:id/cert", handler.BindDeviceCert) // 设备证书绑定接口
+	r.POST("/bind/devices/:id/key", handler.BindDeviceKey)   // 设备密钥绑定接口
+
+	// 获取证书信息
+	r.GET("/cert/info", handler.GetCertInfo) // 获取证书信息接口
 }

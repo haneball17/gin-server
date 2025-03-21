@@ -1,6 +1,6 @@
 # Gin Server
 
-基于Gin框架的服务器应用，提供用户认证、设备管理和配置管理功能。
+基于Gin框架的服务器应用，提供用户认证、设备管理、配置管理和证书管理功能。
 
 ## 功能特性
 
@@ -12,6 +12,12 @@
   - 设备注册
   - 设备信息查询
   - 设备信息更新
+- 证书管理（新增功能）
+  - 用户证书/密钥绑定
+  - 设备证书/密钥绑定
+  - 证书信息查询
+  - 自动创建证书目录
+  - 安全存储和权限控制
 - 认证管理
   - 认证记录查询
   - 权限控制
@@ -41,9 +47,7 @@
     "passWD": "string",         // 密码，必填，最少8字符
     "userID": int,              // 用户唯一标识，必填
     "userType": int,            // 用户类型，必填
-    "gatewayDeviceID": "string", // 用户所属网关设备ID，必填,注意：用户注册之前需先进行设备注册，获取到真实设备id之后才可以进行用户注册。
-    "certID": "string",         // 证书ID，可选
-    "keyID": "string"           // 密钥ID，可选
+    "gatewayDeviceID": "string" // 用户所属网关设备ID，必填,注意：用户注册之前需先进行设备注册，获取到真实设备id之后才可以进行用户注册。
   }
   ```
 - **响应示例**:
@@ -158,6 +162,111 @@
     "message": "Device updated successfully",
     "data": {
       // 更新的字段信息
+    }
+  }
+  ```
+
+### 证书管理接口（新增）
+
+#### 1. 绑定用户证书
+
+- **接口**: POST `/bind/users/:id/cert`
+- **功能**: 上传并绑定用户的证书文件
+- **路径参数**: id - 用户ID
+- **请求格式**: multipart/form-data
+- **请求参数**:
+  - cert: 证书文件（.pem格式）
+- **响应示例**:
+  ```json
+  {
+    "code": 200,
+    "message": "证书绑定成功",
+    "data": {
+      "userID": "1001",
+      "certPath": "/path/to/cert/file.pem"
+    }
+  }
+  ```
+
+#### 2. 绑定用户密钥
+
+- **接口**: POST `/bind/users/:id/key`
+- **功能**: 上传并绑定用户的密钥文件
+- **路径参数**: id - 用户ID
+- **请求格式**: multipart/form-data
+- **请求参数**:
+  - key: 密钥文件（.pem格式）
+- **响应示例**:
+  ```json
+  {
+    "code": 200,
+    "message": "密钥绑定成功",
+    "data": {
+      "userID": "1001",
+      "keyPath": "/path/to/key/file.pem"
+    }
+  }
+  ```
+
+#### 3. 绑定设备证书
+
+- **接口**: POST `/bind/devices/:id/cert`
+- **功能**: 上传并绑定设备的证书文件
+- **路径参数**: id - 设备ID
+- **请求格式**: multipart/form-data
+- **请求参数**:
+  - cert: 证书文件（.pem格式）
+- **响应示例**:
+  ```json
+  {
+    "code": 200,
+    "message": "证书绑定成功",
+    "data": {
+      "deviceID": "DEV123456",
+      "certPath": "/path/to/cert/file.pem"
+    }
+  }
+  ```
+
+#### 4. 绑定设备密钥
+
+- **接口**: POST `/bind/devices/:id/key`
+- **功能**: 上传并绑定设备的密钥文件
+- **路径参数**: id - 设备ID
+- **请求格式**: multipart/form-data
+- **请求参数**:
+  - key: 密钥文件（.pem格式）
+- **响应示例**:
+  ```json
+  {
+    "code": 200,
+    "message": "密钥绑定成功",
+    "data": {
+      "deviceID": "DEV123456",
+      "keyPath": "/path/to/key/file.pem"
+    }
+  }
+  ```
+
+#### 5. 获取证书信息
+
+- **接口**: GET `/cert/info`
+- **功能**: 获取指定实体（用户或设备）的证书信息
+- **查询参数**:
+  - type: 实体类型（user或device）
+  - id: 实体ID
+- **响应示例**:
+  ```json
+  {
+    "code": 200,
+    "message": "获取证书信息成功",
+    "data": {
+      "id": 1,
+      "entity_type": "user",
+      "entity_id": "1001",
+      "cert_path": "/path/to/cert/file.pem",
+      "key_path": "/path/to/key/file.pem",
+      "upload_time": "2024-03-20T10:15:30Z"
     }
   }
   ```
@@ -290,6 +399,10 @@ gin-server/
 │   ├── handler/   # 请求处理器
 │   ├── model/     # 数据模型
 │   └── router/    # 路由配置
+├── test/          # 测试工具
+│   ├── cert_test.go  # 证书绑定测试工具
+│   ├── curl_test.sh  # curl命令测试脚本
+│   └── README.md     # 测试工具说明
 └── main.go        # 主程序入口
 ```
 
@@ -318,6 +431,355 @@ gin-server/
    - 建议将密钥文件放在单独的安全目录
    - 确保密钥文件具有适当的访问权限
 
+## 证书管理说明（新增）
+
+### 证书存储结构
+
+证书和密钥文件按照以下结构存储：
+
+```
+regist/certs/
+├── certs/             # 存放证书文件
+│   ├── user_1001.pem  # 用户证书文件(命名格式: user_<userID>.pem)
+│   └── device_DEV123456.pem  # 设备证书文件(命名格式: device_<deviceID>.pem)
+└── keys/              # 存放密钥文件
+    ├── user_1001.pem  # 用户密钥文件
+    └── device_DEV123456.pem  # 设备密钥文件
+```
+
+### 安全考虑
+
+- 证书目录：权限设置为0755
+- 密钥目录：权限设置为0700（更严格的权限控制）
+- 证书文件：权限默认为0644
+- 密钥文件：权限设置为0600（只有所有者可读写）
+
+### 数据库结构
+
+证书信息存储在`certs`表中，包含以下字段：
+
+| 字段名      | 类型      | 描述                | 约束                |
+|-------------|-----------|-------------------|---------------------|
+| id          | INT       | 自增主键           | AUTO_INCREMENT PRIMARY KEY |
+| entity_type | VARCHAR(10) | 实体类型(user/device) | NOT NULL           |
+| entity_id   | VARCHAR(20) | 实体ID           | NOT NULL           |
+| cert_path   | VARCHAR(255) | 证书文件路径      | NULL               |
+| key_path    | VARCHAR(255) | 密钥文件路径      | NULL               |
+| upload_time | DATETIME  | 上传时间           | NOT NULL           |
+
+索引：
+- 联合索引：`(entity_type, entity_id)`
+
+### 测试工具
+
+为测试证书功能，我们提供了两种测试工具：
+
+1. Go测试工具 (`test/cert_test.go`)
+   - 完整功能测试，支持创建测试用户和设备
+   - 自动测试所有证书绑定API
+   - 验证数据库记录
+
+   在Windows系统中使用方法：
+   ```powershell
+   cd D:\code\golang\git\gin-server\test
+   go build -o cert_test.exe cert_test.go
+   .\cert_test.exe -create-device -create-user -test-all
+   ```
+
+2. Shell脚本工具 (`test/curl_test.sh`)
+   - 使用curl命令测试API
+   - 生成测试证书和密钥
+   - 适用于Linux/Mac或Windows的Git Bash环境
+
+   使用方法：
+   ```bash
+   chmod +x test/curl_test.sh
+   ./test/curl_test.sh
+   ```
+
+详细的测试工具说明请参考 `test/README.md` 文件。
+
+## 证书管理接口请求示例
+
+### 1. 绑定用户证书
+
+**接口**: `POST /bind/users/:id/cert`
+
+#### cURL 请求示例
+
+```bash
+curl -X POST http://localhost:8080/bind/users/1001/cert \
+  -F "cert=@/path/to/user_certificate.pem"
+```
+
+#### 请求说明
+
+- 使用multipart/form-data格式上传文件
+- `:id` 替换为实际的用户ID (例如：1001)
+- 表单字段名必须为 `cert`
+- 文件必须是PEM格式的证书文件
+- 文件大小不得超过8MB
+
+#### 响应示例 (成功)
+
+```json
+{
+  "code": 200,
+  "message": "证书绑定成功",
+  "data": {
+    "userID": "1001",
+    "certPath": "/d/code/golang/git/gin-server/regist/certs/certs/user_1001.pem"
+  }
+}
+```
+
+#### 响应示例 (失败)
+
+```json
+{
+  "error": "用户不存在"
+}
+```
+
+### 2. 绑定用户密钥
+
+**接口**: `POST /bind/users/:id/key`
+
+#### cURL 请求示例
+
+```bash
+curl -X POST http://localhost:8080/bind/users/1001/key \
+  -F "key=@/path/to/user_private_key.pem"
+```
+
+#### 请求说明
+
+- 使用multipart/form-data格式上传文件
+- `:id` 替换为实际的用户ID (例如：1001)
+- 表单字段名必须为 `key`
+- 文件必须是PEM格式的私钥文件
+- 文件大小不得超过8MB
+
+#### 响应示例 (成功)
+
+```json
+{
+  "code": 200,
+  "message": "密钥绑定成功",
+  "data": {
+    "userID": "1001",
+    "keyPath": "/d/code/golang/git/gin-server/regist/certs/keys/user_1001.pem"
+  }
+}
+```
+
+#### 响应示例 (失败)
+
+```json
+{
+  "error": "无法保存密钥文件"
+}
+```
+
+### 3. 绑定设备证书
+
+**接口**: `POST /bind/devices/:id/cert`
+
+#### cURL 请求示例
+
+```bash
+curl -X POST http://localhost:8080/bind/devices/DEV123456/cert \
+  -F "cert=@/path/to/device_certificate.pem"
+```
+
+#### 请求说明
+
+- 使用multipart/form-data格式上传文件
+- `:id` 替换为实际的设备ID (例如：DEV123456)
+- 表单字段名必须为 `cert`
+- 文件必须是PEM格式的证书文件
+- 文件大小不得超过8MB
+
+#### 响应示例 (成功)
+
+```json
+{
+  "code": 200,
+  "message": "证书绑定成功",
+  "data": {
+    "deviceID": "DEV123456",
+    "certPath": "/d/code/golang/git/gin-server/regist/certs/certs/device_DEV123456.pem"
+  }
+}
+```
+
+#### 响应示例 (失败)
+
+```json
+{
+  "error": "设备不存在"
+}
+```
+
+### 4. 绑定设备密钥
+
+**接口**: `POST /bind/devices/:id/key`
+
+#### cURL 请求示例
+
+```bash
+curl -X POST http://localhost:8080/bind/devices/DEV123456/key \
+  -F "key=@/path/to/device_private_key.pem"
+```
+
+#### 请求说明
+
+- 使用multipart/form-data格式上传文件
+- `:id` 替换为实际的设备ID (例如：DEV123456)
+- 表单字段名必须为 `key`
+- 文件必须是PEM格式的私钥文件
+- 文件大小不得超过8MB
+
+#### 响应示例 (成功)
+
+```json
+{
+  "code": 200,
+  "message": "密钥绑定成功",
+  "data": {
+    "deviceID": "DEV123456",
+    "keyPath": "/d/code/golang/git/gin-server/regist/certs/keys/device_DEV123456.pem"
+  }
+}
+```
+
+#### 响应示例 (失败)
+
+```json
+{
+  "error": "文件大小超过限制"
+}
+```
+
+### 5. 获取证书信息
+
+**接口**: `GET /cert/info`
+
+#### cURL 请求示例 (获取用户证书信息)
+
+```bash
+curl -X GET "http://localhost:8080/cert/info?type=user&id=1001"
+```
+
+#### cURL 请求示例 (获取设备证书信息)
+
+```bash
+curl -X GET "http://localhost:8080/cert/info?type=device&id=DEV123456"
+```
+
+#### 请求说明
+
+- 使用查询参数传递实体类型和ID
+- `type` 参数必须为 `user` 或 `device`
+- `id` 参数为实体的唯一标识
+
+#### 响应示例 (成功)
+
+```json
+{
+  "code": 200,
+  "message": "获取证书信息成功",
+  "data": {
+    "id": 1,
+    "entity_type": "user",
+    "entity_id": "1001",
+    "cert_path": "/d/code/golang/git/gin-server/regist/certs/certs/user_1001.pem",
+    "key_path": "/d/code/golang/git/gin-server/regist/certs/keys/user_1001.pem",
+    "upload_time": "2023-08-15T14:30:15Z"
+  }
+}
+```
+
+#### 响应示例 (未找到记录)
+
+```json
+{
+  "code": 200,
+  "message": "未找到证书记录",
+  "data": null
+}
+```
+
+#### 响应示例 (参数错误)
+
+```json
+{
+  "error": "缺少必要的参数"
+}
+```
+
+### 请求示例中的参数说明
+
+#### 1. 实体ID格式
+
+- 用户ID：整数类型，例如 1001, 1002 等
+- 设备ID：字符串类型，例如 DEV123456, DEV789012 等
+
+#### 2. 证书和密钥文件要求
+
+- 格式：必须是PEM编码的X.509证书和私钥
+- 大小：最大8MB
+- 证书示例：
+  ```
+  -----BEGIN CERTIFICATE-----
+  MIIDazCCAlOgAwIBAgIUECPZA...（中间内容省略）...BtNJ9AQKBgQD
+  -----END CERTIFICATE-----
+  ```
+- 密钥示例：
+  ```
+  -----BEGIN PRIVATE KEY-----
+  MIIEvQIBADANBgkqhkiG9w0BA...（中间内容省略）...QA5BICbW1gtrIByvXbpPuPE=
+  -----END PRIVATE KEY-----
+  ```
+
+#### 3. 常见错误处理
+
+| 错误情况 | HTTP状态码 | 错误信息 |
+|---------|-----------|---------|
+| 缺少文件 | 400 | "未找到证书文件" 或 "未找到密钥文件" |
+| 实体不存在 | 404 | "用户不存在" 或 "设备不存在" |
+| 文件过大 | 413 | "文件大小超过限制" |
+| 文件格式错误 | 400 | "无效的证书格式" 或 "无效的密钥格式" |
+| 服务器错误 | 500 | "保存文件失败" 或 "数据库操作失败" |
+
+### 批量测试示例
+
+可以使用提供的Shell脚本进行批量测试：
+
+```bash
+# 在Windows系统使用Git Bash
+cd /d/code/golang/git/gin-server
+./test/curl_test.sh
+
+# 或在Linux/Mac系统
+chmod +x test/curl_test.sh
+./test/curl_test.sh
+```
+
+或使用Go测试工具：
+
+```bash
+# 在Windows系统使用PowerShell
+cd D:\code\golang\git\gin-server\test
+go build -o cert_test.exe cert_test.go
+.\cert_test.exe -create-device -create-user -test-all
+
+# 或在Linux/Mac系统
+cd /path/to/gin-server/test
+go build -o cert_test cert_test.go
+./cert_test -create-device -create-user -test-all
+```
+
 ## 注意事项
 
 1. 系统兼容性
@@ -345,6 +807,12 @@ gin-server/
 
    - 生产环境建议关闭调试模式
    - 调试日志可能包含敏感信息
+6. 证书和密钥安全（新增）
+
+   - 证书和密钥应当妥善保管
+   - 密钥文件权限设置为限制性权限(0600)
+   - 定期更新证书和密钥
+   - 对证书的有效性进行验证
 
 ## 常见问题
 
@@ -360,6 +828,14 @@ gin-server/
 
    - Q: 数据库连接失败？
    - A: 检查数据库配置和网络连接
+4. 证书相关问题（新增）
+
+   - Q: 上传证书失败？
+   - A: 确保证书格式为PEM，大小不超过8MB
+   - Q: 证书目录不存在？
+   - A: 系统会在启动时自动创建证书目录结构
+   - Q: Windows下运行测试工具失败？
+   - A: 请使用`.\cert_test.exe`而不是`./cert_test`命令
 
 ## 贡献指南
 
@@ -393,6 +869,7 @@ gin-server/
 - LOG_UPLOAD：日志上传相关告警
 - STRATEGY_SYNC：策略同步相关告警
 - STRATEGY_APPLY：策略应用相关告警
+- CERT_BINDING：证书绑定相关告警（新增）
 
 ### 告警信息结构
 
@@ -436,6 +913,7 @@ err := alerter.Alert(alertInfo)
 ### 日志生成周期
 
 系统默认每5分钟生成一次日志文件，记录最近5分钟内的系统运行状态，包括：
+
 - 设备状态（CPU使用率、内存使用率、在线时长等）
 - 用户行为（文件传输、消息发送等）
 - 安全事件
@@ -515,55 +993,138 @@ err := alerter.Alert(alertInfo)
 }
 ```
 
-### 使用示例
+## 数据库结构说明
 
-```go
-// 创建日志管理器
-logManager := log.NewLogManager(cfg, db)
+项目使用了两个主要的数据库：
 
-// 启动日志管理器（自动定时生成）
-err := logManager.Start()
-if err != nil {
-    log.Fatalf("启动日志管理器失败: %v", err)
-}
+### 1. 主数据库 (gin_server)
 
-// 手动生成日志
-err = logManager.GenerateLog()
-if err != nil {
-    log.Printf("生成日志失败: %v", err)
-}
+主数据库包含以下表：
 
-// 停止日志管理器
-err = logManager.Stop()
-if err != nil {
-    log.Printf("停止日志管理器失败: %v", err)
-}
-```
+#### 1.1 设备表 (devices)
 
-### 日志文件存储
+| 字段名                    | 类型         | 描述                                                                      | 约束                         |
+| ------------------------- | ------------ | ------------------------------------------------------------------------- | ---------------------------- |
+| id                        | INT          | 自增主键                                                                  | AUTO_INCREMENT PRIMARY KEY   |
+| deviceName                | VARCHAR(50)  | 设备名称                                                                  | NOT NULL                     |
+| deviceType                | INT          | 设备类型，1:网关设备A型，2:网关设备B型，3:网关设备C型，4:安全接入管理设备 | NOT NULL                     |
+| passWD                    | VARCHAR(255) | 设备登录口令                                                              | NOT NULL                     |
+| deviceID                  | CHAR(12)     | 设备唯一标识                                                              | NOT NULL                     |
+| superiorDeviceID          | CHAR(12)     | 上级设备ID                                                                | NOT NULL                     |
+| deviceStatus              | INT          | 设备状态，1:在线，2:离线，3:冻结，4:注销                                  | DEFAULT 2                    |
+| peakCPUUsage              | INT          | 峰值CPU使用率                                                             | DEFAULT 0                    |
+| peakMemoryUsage           | INT          | 峰值内存使用率                                                            | DEFAULT 0                    |
+| onlineDuration            | INT          | 在线时长                                                                  | DEFAULT 0                    |
+| certID                    | VARCHAR(64)  | 证书ID                                                                    | NULL                         |
+| keyID                     | VARCHAR(64)  | 密钥ID                                                                    | NULL                         |
+| registerIP                | VARCHAR(24)  | 上级设备IP                                                                | NULL                         |
+| email                     | VARCHAR(32)  | 联系邮箱                                                                  | NULL                         |
+| deviceHardwareFingerprint | CHAR(128)    | 设备硬件指纹                                                              | NULL                         |
+| anonymousUser             | VARCHAR(50)  | 匿名用户                                                                  | NULL                         |
+| created_at                | TIMESTAMP(3) | 创建时间                                                                  | DEFAULT CURRENT_TIMESTAMP(3) |
 
-日志文件按照时间戳命名的目录存储，格式为：
-```
-logs/
-├── 20240307100000/
-│   └── log.json
-├── 20240307100500/
-│   └── log.json
-└── 20240307101000/
-    └── log.json
-```
+索引：
 
-### 注意事项
+- `idx_deviceid` (deviceID)
+- `idx_devicename` (deviceName)
+- `idx_superiordeviceid` (superiorDeviceID)
 
-1. 时间范围
-   - 每个日志文件记录5分钟内的数据
-   - 时间戳使用UTC格式
+#### 1.2 用户表 (users)
 
-2. 数据完整性
-   - 确保数据库中的时间戳字段准确
-   - 用户行为和事件时间应在统计时间范围内
+| 字段名             | 类型         | 描述                                     | 约束                         |
+| ------------------ | ------------ | ---------------------------------------- | ---------------------------- |
+| id                 | INT          | 自增主键                                 | AUTO_INCREMENT PRIMARY KEY   |
+| userName           | VARCHAR(20)  | 用户名                                   | NOT NULL                     |
+| passWD             | VARCHAR(255) | 密码                                     | NOT NULL                     |
+| userID             | INT          | 用户唯一标识                             | NOT NULL                     |
+| userType           | INT          | 用户类型                                 | NOT NULL                     |
+| gatewayDeviceID    | VARCHAR(12)  | 用户所属网关设备ID                       | NOT NULL，FOREIGN KEY        |
+| status             | INT          | 用户状态，1:在线，2:离线，3:冻结，4:注销 | NULL                         |
+| onlineDuration     | INT          | 在线时长                                 | NULL, DEFAULT 0              |
+| certID             | VARCHAR(64)  | 证书ID                                   | NULL                         |
+| keyID              | VARCHAR(64)  | 密钥ID                                   | NULL                         |
+| email              | VARCHAR(32)  | 邮箱                                     | NULL                         |
+| permissionMask     | CHAR(8)      | 权限位掩码                               | NULL                         |
+| lastLoginTimeStamp | DATETIME(3)  | 登录时间戳                               | NULL                         |
+| offLineTimeStamp   | DATETIME(3)  | 离线时间戳                               | NULL                         |
+| loginIP            | CHAR(24)     | 用户登录IP                               | NULL                         |
+| illegalLoginTimes  | INT          | 用户本次的非法登录次数                   | NULL                         |
+| created_at         | TIMESTAMP(3) | 创建时间                                 | DEFAULT CURRENT_TIMESTAMP(3) |
 
-3. 性能考虑
-   - 合理设置生成间隔
-   - 注意日志文件大小
-   - 定期清理历史日志
+索引：
+
+- `idx_userid` (userID)
+- `idx_username` (userName)
+- `idx_email` (email)
+- `idx_gatewaydeviceid` (gatewayDeviceID)
+
+外键关系：
+
+- `gatewayDeviceID` 关联 `devices(deviceID)` 表
+
+#### 1.3 用户行为表 (user_behaviors)
+
+| 字段名       | 类型         | 描述                     | 约束                         |
+| ------------ | ------------ | ------------------------ | ---------------------------- |
+| behaviorID   | INT          | 行为ID                   | AUTO_INCREMENT PRIMARY KEY   |
+| userID       | INT          | 用户ID                   | NOT NULL，FOREIGN KEY        |
+| behaviorTime | DATETIME(3)  | 行为开始时间             | NOT NULL                     |
+| behaviorType | INT          | 行为类型，1:发送，2:接收 | NOT NULL                     |
+| dataType     | INT          | 数据类型，1:文件，2:消息 | NOT NULL                     |
+| dataSize     | BIGINT       | 数据大小                 | NOT NULL                     |
+| created_at   | TIMESTAMP(3) | 创建时间                 | DEFAULT CURRENT_TIMESTAMP(3) |
+
+索引：
+
+- `idx_userid` (userID)
+- `idx_behaviortime` (behaviorTime)
+- `idx_behaviortype` (behaviorType)
+
+外键关系：
+
+- `userID` 关联 `users(userID)` 表
+
+#### 1.4 事件表 (events)
+
+| 字段名    | 类型         | 描述                             | 约束                      |
+| --------- | ------------ | -------------------------------- | ------------------------- |
+| eventId   | BIGINT       | 事件ID                           | PRIMARY KEY               |
+| deviceId  | VARCHAR(12)  | 设备ID                           | NOT NULL                  |
+| eventTime | DATETIME     | 事件发生时间                     | NOT NULL                  |
+| eventType | INT          | 事件类型，1:安全事件，2:故障事件 | NOT NULL                  |
+| eventCode | VARCHAR(20)  | 事件代码                         | NOT NULL                  |
+| eventDesc | VARCHAR(255) | 事件描述                         | NOT NULL                  |
+| createdAt | TIMESTAMP    | 创建时间                         | DEFAULT CURRENT_TIMESTAMP |
+
+#### 1.5 证书表 (certs) （新增）
+
+| 字段名      | 类型        | 描述                | 约束                      |
+| ----------- | ----------- | ------------------- | ------------------------- |
+| id          | INT         | 自增主键            | AUTO_INCREMENT PRIMARY KEY |
+| entity_type | VARCHAR(10) | 实体类型(user/device) | NOT NULL                |
+| entity_id   | VARCHAR(20) | 实体ID              | NOT NULL                |
+| cert_path   | VARCHAR(255) | 证书文件路径        | NULL                    |
+| key_path    | VARCHAR(255) | 密钥文件路径        | NULL                    |
+| upload_time | DATETIME    | 上传时间            | NOT NULL                |
+
+索引：
+
+- `idx_entity` (entity_type, entity_id)
+
+### 2. Radius认证数据库 (radius)
+
+#### 2.1 认证记录表 (radpostauth)
+
+| 字段名   | 类型         | 描述     | 约束                         |
+| -------- | ------------ | -------- | ---------------------------- |
+| id       | INT          | 自增主键 | AUTO_INCREMENT PRIMARY KEY   |
+| username | VARCHAR(64)  | 用户名   | NOT NULL                     |
+| pass     | VARCHAR(64)  | 密码     | NOT NULL                     |
+| reply    | VARCHAR(32)  | 认证响应 | NOT NULL                     |
+| authdate | TIMESTAMP(6) | 认证时间 | DEFAULT CURRENT_TIMESTAMP(6) |
+| class    | VARCHAR(64)  | 认证类型 | NULL                         |
+
+索引：
+
+- `idx_username` (username)
+- `idx_class` (class)

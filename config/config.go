@@ -95,12 +95,23 @@ type LogManagerConfig struct {
 	GenerateInterval int
 
 	// EnableEncryption 是否启用加密
-	// true: 启用日志加密, false: 不加密
-	EnableEncryption bool
+	EnableEncryption bool `yaml:"enable_encryption"`
+
+	// LogDir 日志目录
+	LogDir string `yaml:"log_dir"`
+
+	// UploadDir 远程上传目录
+	// 指定日志文件上传到远程存储的目录路径
+	UploadDir string `yaml:"upload_dir"`
 
 	// Encryption 加密配置
-	// 指定日志加密的相关参数
-	Encryption EncryptionConfig
+	Encryption EncryptionConfig `yaml:"encryption"`
+
+	// ProcessedLogPath 处理后的日志文件路径
+	ProcessedLogPath string `json:"-" yaml:"-"`
+
+	// ProcessedKeyPath 处理后的密钥文件路径
+	ProcessedKeyPath string `json:"-" yaml:"-"`
 }
 
 // StrategyManagerConfig 策略管理配置结构体
@@ -250,14 +261,16 @@ func InitConfig() {
 		ConfigManager: ConfigManagerConfig{
 			// 日志管理配置
 			LogManager: LogManagerConfig{
-				GenerateInterval: getEnvInt("LOG_GENERATE_INTERVAL", 5),
-				EnableEncryption: getEnvBool("LOG_ENABLE_ENCRYPTION", false),
+				GenerateInterval: getEnvInt("LOG_GENERATE_INTERVAL", 10),
+				EnableEncryption: getEnvBool("LOG_ENABLE_ENCRYPTION", true),
+				LogDir:           getEnv("LOG_DIR", "logs"),
+				UploadDir:        getEnv("LOG_UPLOAD_DIR", "log"),
 				Encryption: EncryptionConfig{
 					AESKeyLength:       getEnvInt("LOG_AES_KEY_LENGTH", 256),
 					PublicKeyAlgorithm: getEnv("LOG_PUBLIC_KEY_ALGORITHM", "RSA"),
 					PublicKeyLength:    getEnvInt("LOG_PUBLIC_KEY_LENGTH", 2048),
-					PublicKeyPath:      getEnv("LOG_PUBLIC_KEY_PATH", "keys/ops_public.pem"),
-					PrivateKeyPath:     getEnv("LOG_PRIVATE_KEY_PATH", "keys/system_private.pem"),
+					PublicKeyPath:      getEnv("LOG_PUBLIC_KEY_PATH", "keys/public.pem"),
+					PrivateKeyPath:     getEnv("LOG_PRIVATE_KEY_PATH", "keys/private.pem"),
 				},
 			},
 			// 策略管理配置
@@ -268,8 +281,8 @@ func InitConfig() {
 					AESKeyLength:       getEnvInt("STRATEGY_AES_KEY_LENGTH", 256),
 					PublicKeyAlgorithm: getEnv("STRATEGY_PUBLIC_KEY_ALGORITHM", "RSA"),
 					PublicKeyLength:    getEnvInt("STRATEGY_PUBLIC_KEY_LENGTH", 2048),
-					PublicKeyPath:      getEnv("STRATEGY_PUBLIC_KEY_PATH", "keys/ops_public.pem"),
-					PrivateKeyPath:     getEnv("STRATEGY_PRIVATE_KEY_PATH", "keys/system_private.pem"),
+					PublicKeyPath:      getEnv("STRATEGY_PUBLIC_KEY_PATH", "keys/public.pem"),
+					PrivateKeyPath:     getEnv("STRATEGY_PRIVATE_KEY_PATH", "keys/private.pem"),
 				},
 			},
 			// 存储配置
@@ -362,11 +375,60 @@ func getEnvBool(key string, defaultValue bool) bool {
 // DefaultConfig 返回默认配置
 func DefaultConfig() *Config {
 	return &Config{
-		Gitee: &GiteeConfig{
-			Branch: "master",
-		},
-		FTP: &FTPConfig{
-			Port: 21,
+		DebugLevel: "false",
+		ServerPort: "8080",
+		DBUser:     "root",
+		DBPassword: "",
+		DBHost:     "localhost",
+		DBPort:     "3306",
+		DBName:     "gin_server",
+		ConfigManager: ConfigManagerConfig{
+			LogManager: LogManagerConfig{
+				GenerateInterval: 1,
+				EnableEncryption: true,
+				LogDir:           "logs",
+				UploadDir:        "log",
+				Encryption: EncryptionConfig{
+					AESKeyLength:       256,
+					PublicKeyAlgorithm: "RSA",
+					PublicKeyLength:    2048,
+					PublicKeyPath:      "keys/public.pem",
+					PrivateKeyPath:     "keys/private.pem",
+				},
+			},
+			StrategyManager: StrategyManagerConfig{
+				PollInterval:     60,
+				EnableEncryption: false,
+				Encryption: EncryptionConfig{
+					AESKeyLength:       256,
+					PublicKeyAlgorithm: "RSA",
+					PublicKeyLength:    2048,
+					PublicKeyPath:      "keys/ops_public.pem",
+					PrivateKeyPath:     "keys/system_private.pem",
+				},
+			},
+			Storage: StorageConfig{
+				Type: "gitee",
+				Gitee: GiteeConfig{
+					AccessToken: "",
+					Owner:       "",
+					Repo:        "",
+					Branch:      "master",
+				},
+				FTP: FTPConfig{
+					Host:     "127.0.0.1",
+					Port:     21,
+					Username: "",
+					Password: "",
+				},
+			},
+			Compress: CompressConfig{
+				Format:           "tar.gz",
+				CompressionLevel: 6,
+				BufferSize:       32 * 1024,
+				IncludePatterns:  []string{},
+				ExcludePatterns:  []string{},
+			},
 		},
 	}
 }

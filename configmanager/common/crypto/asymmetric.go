@@ -32,26 +32,33 @@ type AsymmetricEncryptor interface {
 type RSAEncryptor struct {
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
+	keyLength  int
 }
 
-// NewRSAEncryptor 创建新的RSA加密器
+// NewRSAEncryptor 创建RSA加密器
 func NewRSAEncryptor(keyLength int) (*RSAEncryptor, error) {
+	// 验证密钥长度
 	if keyLength != 1024 && keyLength != 2048 && keyLength != 4096 {
 		return nil, fmt.Errorf("不支持的RSA密钥长度: %d", keyLength)
 	}
 
-	return &RSAEncryptor{}, nil
+	return &RSAEncryptor{
+		keyLength: keyLength,
+	}, nil
 }
 
 // GenerateKeyPair 生成RSA密钥对
 func (e *RSAEncryptor) GenerateKeyPair() error {
-	privateKey, err := rsa.GenerateKey(rand.Reader, e.publicKey.Size()*8)
+	// 生成私钥
+	privateKey, err := rsa.GenerateKey(rand.Reader, e.keyLength)
 	if err != nil {
 		return fmt.Errorf("生成RSA密钥对失败: %w", err)
 	}
 
+	// 设置私钥和公钥
 	e.privateKey = privateKey
 	e.publicKey = &privateKey.PublicKey
+
 	return nil
 }
 
