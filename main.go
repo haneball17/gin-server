@@ -8,6 +8,7 @@ import (
 	"gin-server/config"
 	"gin-server/configmanager/common/crypto"
 	"gin-server/configmanager/log"
+	logModel "gin-server/configmanager/log/model"
 	"gin-server/regist/model"
 	"gin-server/regist/router"
 
@@ -42,6 +43,13 @@ func main() {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		stdlog.Fatalf("连接GORM数据库失败: %v", err)
+	}
+
+	// 检查并迁移数据库表结构
+	if err := logModel.MigrateDatabase(db); err != nil {
+		stdlog.Printf("检查并迁移数据库表结构失败: %v", err)
+	} else {
+		stdlog.Println("数据库表结构检查和迁移完成")
 	}
 
 	// 初始化日志管理器
