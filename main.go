@@ -80,6 +80,9 @@ func main() {
 	router.SetupRouter(r)     // 设置注册模块路由
 	authRouter.SetupRouter(r) // 设置认证管理模块路由
 
+	// 注册日志路由
+	log.RegisterRoutes(r, logManager)
+
 	// 启动服务
 	stdlog.Printf("服务器启动，监听端口: %s\n", cfg.ServerPort)
 	r.Run(":" + cfg.ServerPort)

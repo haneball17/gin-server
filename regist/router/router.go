@@ -32,6 +32,10 @@ func SetupRouter(r *gin.Engine) {
 	r.GET("/search/devices", handler.GetDevices)       // 获取所有设备接口
 	r.PUT("/update/devices/:id", handler.UpdateDevice) // 更新设备接口
 
+	// 新增：指定用户和设备查询接口
+	r.GET("/search/user", handler.GetUserByID)     // 根据ID查询用户接口
+	r.GET("/search/device", handler.GetDeviceByID) // 根据ID查询设备接口
+
 	// 证书管理路由
 	// 用户证书绑定
 	r.POST("/bind/users/:id/cert", handler.BindUserCert) // 用户证书绑定接口

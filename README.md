@@ -82,7 +82,37 @@
   }
   ```
 
-#### 3. 更新用户信息
+#### 3. 指定用户查找
+
+- **接口**: GET `/search/user`
+- **功能**: 根据ID查询指定用户信息
+- **示例**:http://localhost:8080/search/user?id=10004
+- **查询参数**:
+  - id: 用户ID，必填，整数类型
+- **响应示例(成功)**:
+  ```json
+  {
+    "code": 200,
+    "message": "用户查询成功",
+    "data": {
+      "userName": "string",
+      "userID": int,
+      "userType": int,
+      "gatewayDeviceID": "string",
+      "certID": "string",
+      "keyID": "string",
+      // ... 其他用户信息
+    }
+  }
+  ```
+- **响应示例(用户不存在)**:
+  ```json
+  {
+    "error": "用户不存在"
+  }
+  ```
+
+#### 4. 更新用户信息
 
 - **接口**: PUT `/update/users/:id`
 - **功能**: 更新指定用户的信息
@@ -149,7 +179,37 @@
   }
   ```
 
-#### 3. 更新设备信息
+#### 3. 指定设备查找
+
+- **接口**: GET `/search/device`
+- **功能**: 根据ID查询指定设备信息
+- **示例:http://localhost:8080/search/user?id=10004**
+- **查询参数**:
+  - id: 设备ID，必填，字符串类型
+- **响应示例(成功)**:
+  ```json
+  {
+    "code": 200,
+    "message": "设备查询成功",
+    "data": {
+      "deviceName": "string",
+      "deviceType": int,
+      "deviceID": "string",
+      "superiorDeviceID": "string",
+      "certID": "string",
+      "keyID": "string",
+      // ... 其他设备信息
+    }
+  }
+  ```
+- **响应示例(设备不存在)**:
+  ```json
+  {
+    "error": "设备不存在"
+  }
+  ```
+
+#### 4. 更新设备信息
 
 - **接口**: PUT `/update/devices/:id`
 - **功能**: 更新指定设备的信息
@@ -308,6 +368,99 @@
   }
   ```
 
+### 日志管理接口
+
+#### 1. 获取最新日志
+
+- **接口**: GET `/logs/latest`
+- **功能**: 获取系统中最新生成的日志文件内容
+- **响应格式**: JSON
+- **响应示例**:
+  ```json
+  {
+    "timeRange": {
+      "startTime": "2024-03-07T10:00:00Z",
+      "duration": 300
+    },
+    "securityEvents": {
+      "events": [
+        {
+          "eventId": 1001,
+          "deviceId": "SEC00000001",
+          "eventTime": "2024-03-07T10:02:00Z",
+          "eventType": 1,
+          "eventCode": "SEC_001",
+          "eventDesc": "异常登录尝试",
+          "createdAt": "2024-03-07T10:02:01Z"
+        }
+      ]
+    },
+    "performanceEvents": {
+      "securityDevices": [
+        {
+          "deviceId": "SEC00000001",
+          "cpuUsage": 45,
+          "memoryUsage": 60,
+          "onlineDuration": 3600,
+          "status": 1,
+          "gatewayDevices": [
+            {
+              "deviceId": "GWA00000001",
+              "cpuUsage": 30,
+              "memoryUsage": 40,
+              "onlineDuration": 3600,
+              "status": 1,
+              "users": [
+                {
+                  "userId": 10001,
+                  "status": 1,
+                  "onlineDuration": 1800,
+                  "behaviors": [
+                    {
+                      "time": "2024-03-07T10:01:00Z",
+                      "type": 1,
+                      "dataType": 1,
+                      "dataSize": 1024
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "faultEvents": {
+      "events": [
+        {
+          "eventId": 2001,
+          "deviceId": "GWA00000001",
+          "eventTime": "2024-03-07T10:03:00Z",
+          "eventType": 2,
+          "eventCode": "FAULT_001",
+          "eventDesc": "设备离线",
+          "createdAt": "2024-03-07T10:03:01Z"
+        }
+      ]
+    }
+  }
+  ```
+
+#### 错误响应
+
+```json
+{
+  "error": "查找最新日志文件失败: 日志目录为空，没有日志文件"
+}
+```
+
+#### 使用说明
+
+- 接口会自动查找系统中最新生成的日志文件（按照时间戳文件夹名排序）
+- 会优先检查未加密的日志文件，如果不存在，则尝试获取加密目录中的日志文件
+- 如果不存在任何日志文件，将返回相应的错误信息
+- 返回的日志内容与日志生成模块生成的JSON结构完全一致
+
 ## 错误码说明
 
 - 200: 成功
@@ -456,18 +609,19 @@ regist/certs/
 
 ### 数据库结构
 
-证书信息存储在`certs`表中，包含以下字段：
+证书信息存储在 `certs`表中，包含以下字段：
 
-| 字段名      | 类型      | 描述                | 约束                |
-|-------------|-----------|-------------------|---------------------|
-| id          | INT       | 自增主键           | AUTO_INCREMENT PRIMARY KEY |
-| entity_type | VARCHAR(10) | 实体类型(user/device) | NOT NULL           |
-| entity_id   | VARCHAR(20) | 实体ID           | NOT NULL           |
-| cert_path   | VARCHAR(255) | 证书文件路径      | NULL               |
-| key_path    | VARCHAR(255) | 密钥文件路径      | NULL               |
-| upload_time | DATETIME  | 上传时间           | NOT NULL           |
+| 字段名      | 类型         | 描述                  | 约束                       |
+| ----------- | ------------ | --------------------- | -------------------------- |
+| id          | INT          | 自增主键              | AUTO_INCREMENT PRIMARY KEY |
+| entity_type | VARCHAR(10)  | 实体类型(user/device) | NOT NULL                   |
+| entity_id   | VARCHAR(20)  | 实体ID                | NOT NULL                   |
+| cert_path   | VARCHAR(255) | 证书文件路径          | NULL                       |
+| key_path    | VARCHAR(255) | 密钥文件路径          | NULL                       |
+| upload_time | DATETIME     | 上传时间              | NOT NULL                   |
 
 索引：
+
 - 联合索引：`(entity_type, entity_id)`
 
 ### 测试工具
@@ -475,23 +629,26 @@ regist/certs/
 为测试证书功能，我们提供了两种测试工具：
 
 1. Go测试工具 (`test/cert_test.go`)
+
    - 完整功能测试，支持创建测试用户和设备
    - 自动测试所有证书绑定API
    - 验证数据库记录
 
    在Windows系统中使用方法：
+
    ```powershell
    cd D:\code\golang\git\gin-server\test
    go build -o cert_test.exe cert_test.go
    .\cert_test.exe -create-device -create-user -test-all
    ```
-
 2. Shell脚本工具 (`test/curl_test.sh`)
+
    - 使用curl命令测试API
    - 生成测试证书和密钥
    - 适用于Linux/Mac或Windows的Git Bash环境
 
    使用方法：
+
    ```bash
    chmod +x test/curl_test.sh
    ./test/curl_test.sh
@@ -744,13 +901,13 @@ curl -X GET "http://localhost:8080/cert/info?type=device&id=DEV123456"
 
 #### 3. 常见错误处理
 
-| 错误情况 | HTTP状态码 | 错误信息 |
-|---------|-----------|---------|
-| 缺少文件 | 400 | "未找到证书文件" 或 "未找到密钥文件" |
-| 实体不存在 | 404 | "用户不存在" 或 "设备不存在" |
-| 文件过大 | 413 | "文件大小超过限制" |
-| 文件格式错误 | 400 | "无效的证书格式" 或 "无效的密钥格式" |
-| 服务器错误 | 500 | "保存文件失败" 或 "数据库操作失败" |
+| 错误情况     | HTTP状态码 | 错误信息                             |
+| ------------ | ---------- | ------------------------------------ |
+| 缺少文件     | 400        | "未找到证书文件" 或 "未找到密钥文件" |
+| 实体不存在   | 404        | "用户不存在" 或 "设备不存在"         |
+| 文件过大     | 413        | "文件大小超过限制"                   |
+| 文件格式错误 | 400        | "无效的证书格式" 或 "无效的密钥格式" |
+| 服务器错误   | 500        | "保存文件失败" 或 "数据库操作失败"   |
 
 ### 批量测试示例
 
@@ -835,7 +992,7 @@ go build -o cert_test cert_test.go
    - Q: 证书目录不存在？
    - A: 系统会在启动时自动创建证书目录结构
    - Q: Windows下运行测试工具失败？
-   - A: 请使用`.\cert_test.exe`而不是`./cert_test`命令
+   - A: 请使用 `.\cert_test.exe`而不是 `./cert_test`命令
 
 ## 贡献指南
 
@@ -926,48 +1083,48 @@ err := alerter.Alert(alertInfo)
 ```json
 {
   "timeRange": {
-    "startTime": "2024-03-07T10:00:00Z",  // 统计起始时间
-    "duration": 300                        // 统计时长（秒）
+    "startTime": "2024-03-07T10:00:00Z",
+    "duration": 300
   },
   "securityEvents": {
     "events": [
       {
-        "eventId": 1001,                   // 事件ID
-        "deviceId": "SEC00000001",         // 设备ID
-        "eventTime": "2024-03-07T10:02:00Z", // 事件发生时间
-        "eventType": 1,                    // 事件类型（1:安全事件）
-        "eventCode": "SEC_001",            // 事件代码
-        "eventDesc": "异常登录尝试",         // 事件描述
-        "createdAt": "2024-03-07T10:02:01Z" // 记录创建时间
+        "eventId": 1001,
+        "deviceId": "SEC00000001",
+        "eventTime": "2024-03-07T10:02:00Z",
+        "eventType": 1,
+        "eventCode": "SEC_001",
+        "eventDesc": "异常登录尝试",
+        "createdAt": "2024-03-07T10:02:01Z"
       }
     ]
   },
   "performanceEvents": {
     "securityDevices": [
       {
-        "deviceId": "SEC00000001",         // 安全接入管理设备ID
-        "cpuUsage": 45,                    // CPU使用率峰值(%)
-        "memoryUsage": 60,                 // 内存使用率峰值(%)
-        "onlineDuration": 3600,            // 在线时长(秒)
-        "status": 1,                       // 设备状态(1:在线,2:离线)
+        "deviceId": "SEC00000001",
+        "cpuUsage": 45,
+        "memoryUsage": 60,
+        "onlineDuration": 3600,
+        "status": 1,
         "gatewayDevices": [
           {
-            "deviceId": "GWA00000001",     // 网关设备ID
-            "cpuUsage": 30,                // CPU使用率峰值(%)
-            "memoryUsage": 40,             // 内存使用率峰值(%)
-            "onlineDuration": 3600,        // 在线时长(秒)
-            "status": 1,                   // 设备状态
+            "deviceId": "GWA00000001",
+            "cpuUsage": 30,
+            "memoryUsage": 40,
+            "onlineDuration": 3600,
+            "status": 1,
             "users": [
               {
-                "userId": 10001,           // 用户ID
-                "status": 1,               // 用户状态(1:在线,2:离线)
-                "onlineDuration": 1800,    // 在线时长(秒)
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
                 "behaviors": [
                   {
-                    "time": "2024-03-07T10:01:00Z", // 行为发生时间
-                    "type": 1,             // 行为类型(1:发送,2:接收)
-                    "dataType": 1,         // 数据类型(1:文件,2:消息)
-                    "dataSize": 1024       // 数据大小(字节)
+                    "time": "2024-03-07T10:01:00Z",
+                    "type": 1,
+                    "dataType": 1,
+                    "dataSize": 1024
                   }
                 ]
               }
@@ -980,13 +1137,13 @@ err := alerter.Alert(alertInfo)
   "faultEvents": {
     "events": [
       {
-        "eventId": 2001,                   // 事件ID
-        "deviceId": "GWA00000001",         // 设备ID
-        "eventTime": "2024-03-07T10:03:00Z", // 事件发生时间
-        "eventType": 2,                    // 事件类型（2:故障事件）
-        "eventCode": "FAULT_001",          // 事件代码
-        "eventDesc": "设备离线",            // 事件描述
-        "createdAt": "2024-03-07T10:03:01Z" // 记录创建时间
+        "eventId": 2001,
+        "deviceId": "GWA00000001",
+        "eventTime": "2024-03-07T10:03:00Z",
+        "eventType": 2,
+        "eventCode": "FAULT_001",
+        "eventDesc": "设备离线",
+        "createdAt": "2024-03-07T10:03:01Z"
       }
     ]
   }
@@ -1098,14 +1255,14 @@ err := alerter.Alert(alertInfo)
 
 #### 1.5 证书表 (certs) （新增）
 
-| 字段名      | 类型        | 描述                | 约束                      |
-| ----------- | ----------- | ------------------- | ------------------------- |
-| id          | INT         | 自增主键            | AUTO_INCREMENT PRIMARY KEY |
-| entity_type | VARCHAR(10) | 实体类型(user/device) | NOT NULL                |
-| entity_id   | VARCHAR(20) | 实体ID              | NOT NULL                |
-| cert_path   | VARCHAR(255) | 证书文件路径        | NULL                    |
-| key_path    | VARCHAR(255) | 密钥文件路径        | NULL                    |
-| upload_time | DATETIME    | 上传时间            | NOT NULL                |
+| 字段名      | 类型         | 描述                  | 约束                       |
+| ----------- | ------------ | --------------------- | -------------------------- |
+| id          | INT          | 自增主键              | AUTO_INCREMENT PRIMARY KEY |
+| entity_type | VARCHAR(10)  | 实体类型(user/device) | NOT NULL                   |
+| entity_id   | VARCHAR(20)  | 实体ID                | NOT NULL                   |
+| cert_path   | VARCHAR(255) | 证书文件路径          | NULL                       |
+| key_path    | VARCHAR(255) | 密钥文件路径          | NULL                       |
+| upload_time | DATETIME     | 上传时间              | NOT NULL                   |
 
 索引：
 

@@ -10,6 +10,8 @@ import (
 	"gin-server/config" // 导入全局配置包
 
 	_ "github.com/go-sql-driver/mysql" // 导入 MySQL 驱动
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 // User 结构体定义用户信息
@@ -1060,4 +1062,82 @@ func CheckDeviceExistsByName(deviceName string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// GetUserByID 使用GORM根据ID查询单个用户
+func GetUserByID(userID int) (*User, error) {
+	cfg := config.GetConfig()
+
+	// 获取数据库连接并创建GORM实例
+	gormDB, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)), &gorm.Config{})
+	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("创建GORM实例失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("数据库连接失败: %w", err)
+	}
+
+	// 关闭数据库连接
+	dbInstance, _ := gormDB.DB()
+	defer dbInstance.Close()
+
+	var user User
+	// 使用Unscoped()禁用GORM的默认作用域（包括默认排序）
+	result := gormDB.Table("users").Unscoped().Where("userID = ?", userID).Order("userID").Limit(1).Find(&user)
+	if result.Error != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("查询用户ID为 %d 的记录失败: %v\n", userID, result.Error)
+		}
+		return nil, fmt.Errorf("查询用户失败: %w", result.Error)
+	}
+
+	// 检查是否找到记录
+	if result.RowsAffected == 0 {
+		if cfg.DebugLevel == "true" {
+			log.Printf("未找到用户ID为 %d 的记录\n", userID)
+		}
+		return nil, nil // 返回nil表示没有找到记录
+	}
+
+	return &user, nil
+}
+
+// GetDeviceByID 使用GORM根据ID查询单个设备
+func GetDeviceByID(deviceID string) (*Device, error) {
+	cfg := config.GetConfig()
+
+	// 获取数据库连接并创建GORM实例
+	gormDB, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)), &gorm.Config{})
+	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("创建GORM实例失败: %v\n", err)
+		}
+		return nil, fmt.Errorf("数据库连接失败: %w", err)
+	}
+
+	// 关闭数据库连接
+	dbInstance, _ := gormDB.DB()
+	defer dbInstance.Close()
+
+	var device Device
+	// 使用Unscoped()禁用GORM的默认作用域（包括默认排序）
+	result := gormDB.Table("devices").Unscoped().Where("deviceID = ?", deviceID).Order("deviceID").Limit(1).Find(&device)
+	if result.Error != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("查询设备ID为 %s 的记录失败: %v\n", deviceID, result.Error)
+		}
+		return nil, fmt.Errorf("查询设备失败: %w", result.Error)
+	}
+
+	// 检查是否找到记录
+	if result.RowsAffected == 0 {
+		if cfg.DebugLevel == "true" {
+			log.Printf("未找到设备ID为 %s 的记录\n", deviceID)
+		}
+		return nil, nil // 返回nil表示没有找到记录
+	}
+
+	return &device, nil
 }

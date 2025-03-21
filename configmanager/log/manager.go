@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -236,4 +237,73 @@ func (m *LogManager) uploadLog(logPath string) error {
 	}
 
 	return nil
+}
+
+// GetLatestLogContent 获取最新的日志文件内容
+func (m *LogManager) GetLatestLogContent() ([]byte, error) {
+	// 获取最新的日志文件路径
+	latestLogPath, err := m.findLatestLogFile()
+	if err != nil {
+		return nil, fmt.Errorf("查找最新日志文件失败: %w", err)
+	}
+
+	// 读取日志文件内容
+	content, err := os.ReadFile(latestLogPath)
+	if err != nil {
+		return nil, fmt.Errorf("读取日志文件失败: %w", err)
+	}
+
+	return content, nil
+}
+
+// findLatestLogFile 查找最新的日志文件
+func (m *LogManager) findLatestLogFile() (string, error) {
+	logDir := "logs"
+
+	// 读取logs目录
+	entries, err := os.ReadDir(logDir)
+	if err != nil {
+		return "", fmt.Errorf("读取日志目录失败: %w", err)
+	}
+
+	if len(entries) == 0 {
+		return "", fmt.Errorf("日志目录为空，没有日志文件")
+	}
+
+	// 按照时间戳排序目录条目（目录名为时间戳格式）
+	var logDirs []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			logDirs = append(logDirs, entry.Name())
+		}
+	}
+
+	if len(logDirs) == 0 {
+		return "", fmt.Errorf("日志目录中没有日志子目录")
+	}
+
+	// 按时间戳排序（降序）
+	sort.Slice(logDirs, func(i, j int) bool {
+		return logDirs[i] > logDirs[j] // 降序排列
+	})
+
+	// 获取最新的目录
+	latestDir := filepath.Join(logDir, logDirs[0])
+
+	// 检查log.json文件是否存在
+	logFilePath := filepath.Join(latestDir, "log.json")
+	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
+		// 如果没有找到log.json文件，检查是否有加密文件夹
+		encryptedDir := filepath.Join(latestDir, "encrypted")
+		encryptedLogPath := filepath.Join(encryptedDir, "log.json")
+
+		if _, err := os.Stat(encryptedLogPath); os.IsNotExist(err) {
+			return "", fmt.Errorf("最新的日志目录中找不到日志文件")
+		}
+
+		// 返回加密的日志文件路径
+		return encryptedLogPath, nil
+	}
+
+	return logFilePath, nil
 }
