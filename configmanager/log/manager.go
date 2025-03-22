@@ -12,6 +12,8 @@ import (
 	"gin-server/config"
 	"gin-server/configmanager/common/alert"
 	"gin-server/configmanager/log/service"
+	"gin-server/database/models"
+	"gin-server/database/repositories"
 
 	"gorm.io/gorm"
 )
@@ -30,14 +32,15 @@ type Manager interface {
 
 // LogManager 日志管理器实现
 type LogManager struct {
-	config    *config.Config
-	db        *gorm.DB
-	generator *service.Generator
-	encryptor service.LogEncryptor
-	uploader  *service.UploadManager
-	alerter   alert.Alerter
-	stopChan  chan struct{}
-	isRunning bool
+	config     *config.Config
+	db         *gorm.DB
+	generator  *service.Generator
+	encryptor  service.LogEncryptor
+	uploader   *service.UploadManager
+	alerter    alert.Alerter
+	logService LogService
+	stopChan   chan struct{}
+	isRunning  bool
 }
 
 // NewLogManager 创建日志管理器
@@ -51,15 +54,22 @@ func NewLogManager(cfg *config.Config, db *gorm.DB) (*LogManager, error) {
 		return nil, fmt.Errorf("创建上传管理器失败: %v", err)
 	}
 
+	// 创建仓库工厂
+	repoFactory := repositories.NewRepositoryFactory(db)
+
+	// 创建日志服务
+	logService := NewLogService(repoFactory)
+
 	return &LogManager{
-		config:    cfg,
-		db:        db,
-		generator: service.NewGenerator(db, alerter),
-		encryptor: service.NewLogEncryptor(cfg, alerter),
-		uploader:  uploader,
-		alerter:   alerter,
-		stopChan:  make(chan struct{}),
-		isRunning: false,
+		config:     cfg,
+		db:         db,
+		generator:  service.NewGenerator(db, alerter),
+		encryptor:  service.NewLogEncryptor(cfg, alerter),
+		uploader:   uploader,
+		alerter:    alerter,
+		logService: logService,
+		stopChan:   make(chan struct{}),
+		isRunning:  false,
 	}, nil
 }
 
@@ -109,56 +119,56 @@ func (m *LogManager) Stop() error {
 	return nil
 }
 
-// GenerateLog 实现Manager接口
+// GenerateLog 生成日志
 func (m *LogManager) GenerateLog() error {
-	startTime := time.Now().Add(-5 * time.Minute)
-	duration := int64(5 * 60) // 5分钟，单位：秒
+	// 获取当前时间作为生成的截止时间
+	now := time.Now()
 
-	// 生成文件路径
-	timestamp := time.Now().Format("20060102150405")
-	filePath := strings.ReplaceAll(filepath.Join("logs", timestamp, "log.json"), "\\", "/")
+	// 获取配置的生成间隔（分钟）
+	intervalMinutes := m.config.ConfigManager.LogManager.GenerateInterval
 
-	// 生成日志文件
-	err := m.generator.GenerateToFile(startTime, duration, filePath)
-	if err != nil {
-		m.alerter.Alert(&alert.Alert{
-			Level:   alert.AlertLevelError,
-			Type:    alert.AlertTypeLogGenerate,
-			Message: "生成日志文件失败",
-			Error:   err,
-			Module:  "LogManager",
-		})
+	// 计算开始时间（当前时间减去间隔时间）
+	startTime := now.Add(-time.Duration(intervalMinutes) * time.Minute)
+
+	// 将生成间隔转换为秒
+	durationSeconds := int64(intervalMinutes * 60)
+
+	// 构建日志文件名（格式：log_YYYYMMDD_HHmmss.json）
+	fileName := fmt.Sprintf("log_%s.json", startTime.Format("20060102_150405"))
+
+	// 确保日志目录存在
+	logDir := m.config.ConfigManager.LogManager.LogDir
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		return fmt.Errorf("创建日志目录失败: %v", err)
+	}
+
+	// 构建日志文件完整路径
+	logPath := filepath.Join(logDir, fileName)
+
+	// 生成日志内容并写入文件
+	if err := m.generator.GenerateToFile(startTime, durationSeconds, logPath); err != nil {
 		return fmt.Errorf("生成日志文件失败: %v", err)
 	}
 
-	// 处理日志文件（可能包含加密）
-	processedPath, keyPath, err := m.encryptor.ProcessLog(filePath)
+	m.alerter.Alert(&alert.Alert{
+		Level:   alert.AlertLevelInfo,
+		Type:    alert.AlertTypeLogGenerate,
+		Message: fmt.Sprintf("成功生成日志文件: %s", fileName),
+		Module:  "LogManager",
+	})
+
+	// 处理日志文件（加密）
+	processedLogPath, keyPath, err := m.encryptor.ProcessLog(logPath)
 	if err != nil {
-		m.alerter.Alert(&alert.Alert{
-			Level:   alert.AlertLevelError,
-			Type:    alert.AlertTypeLogEncrypt,
-			Message: "加密日志文件失败",
-			Error:   err,
-			Module:  "LogManager",
-		})
-		return fmt.Errorf("加密日志文件失败: %v", err)
+		return fmt.Errorf("处理日志文件失败: %v", err)
 	}
 
-	// 规范化路径
-	processedPath = strings.ReplaceAll(processedPath, "\\", "/")
-	if keyPath != "" {
-		keyPath = strings.ReplaceAll(keyPath, "\\", "/")
-	}
+	// 更新生成的日志文件路径和密钥路径到配置
+	m.config.ConfigManager.LogManager.ProcessedLogPath = processedLogPath
+	m.config.ConfigManager.LogManager.ProcessedKeyPath = keyPath
 
-	// 上传处理后的文件
-	if err := m.uploader.Upload(processedPath, keyPath); err != nil {
-		m.alerter.Alert(&alert.Alert{
-			Level:   alert.AlertLevelError,
-			Type:    alert.AlertTypeLogUpload,
-			Message: "上传日志文件失败",
-			Error:   err,
-			Module:  "LogManager",
-		})
+	// 上传日志文件
+	if err := m.uploadLog(processedLogPath); err != nil {
 		return fmt.Errorf("上传日志文件失败: %v", err)
 	}
 
@@ -214,6 +224,7 @@ func (m *LogManager) DownloadLogFile(file service.File) ([]byte, error) {
 	return m.uploader.DownloadFile(uploadDir + file.Path)
 }
 
+// uploadLog 上传指定的日志文件
 func (m *LogManager) uploadLog(logPath string) error {
 	uploadDir := strings.ReplaceAll(m.config.ConfigManager.LogManager.UploadDir, "\\", "/")
 	if !strings.HasSuffix(uploadDir, "/") {
@@ -234,6 +245,26 @@ func (m *LogManager) uploadLog(logPath string) error {
 	err = m.uploader.UploadFile(remotePath, data)
 	if err != nil {
 		return fmt.Errorf("上传日志文件失败: %v", err)
+	}
+
+	// 获取文件信息并创建或更新日志记录
+	fileInfo, err := os.Stat(logPath)
+	if err == nil {
+		// 创建日志文件记录
+		_, err = m.logService.CreateLogFile(fileName, fileInfo.Size(), logPath)
+		if err != nil {
+			return fmt.Errorf("创建日志文件记录失败: %v", err)
+		}
+
+		// 查找最新的日志文件记录
+		latestLog, err := m.logService.GetLatestLogFile()
+		if err == nil && latestLog != nil {
+			// 标记为已上传
+			err = m.logService.MarkLogFileAsUploaded(latestLog.ID, remotePath)
+			if err != nil {
+				return fmt.Errorf("更新日志文件上传状态失败: %v", err)
+			}
+		}
 	}
 
 	return nil
@@ -306,4 +337,29 @@ func (m *LogManager) findLatestLogFile() (string, error) {
 	}
 
 	return logFilePath, nil
+}
+
+// GetEventsByTimeRange 根据时间范围获取事件记录
+func (m *LogManager) GetEventsByTimeRange(startTime, endTime time.Time) ([]models.Event, int64, error) {
+	return m.logService.GetEventsByTimeRange(startTime, endTime)
+}
+
+// CreateEvent 创建事件记录
+func (m *LogManager) CreateEvent(eventCode string, eventDesc string, deviceID string, eventType models.EventType) (*models.Event, error) {
+	return m.logService.CreateEvent(eventCode, eventDesc, deviceID, eventType)
+}
+
+// LogUserBehavior 记录用户行为
+func (m *LogManager) LogUserBehavior(userID int, behaviorType int, dataType int, dataSize int64) (*models.UserBehavior, error) {
+	return m.logService.LogUserBehavior(userID, behaviorType, dataType, dataSize)
+}
+
+// GetUserBehaviorsByUserID 获取用户行为记录
+func (m *LogManager) GetUserBehaviorsByUserID(userID int) ([]models.UserBehavior, int64, error) {
+	return m.logService.GetUserBehaviorsByUserID(userID)
+}
+
+// GetLogFilesByTimeRange 根据时间范围获取日志文件
+func (m *LogManager) GetLogFilesByTimeRange(startTime, endTime time.Time) ([]models.LogFile, int64, error) {
+	return m.logService.GetLogFilesByTimeRange(startTime, endTime)
 }

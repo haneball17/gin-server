@@ -1,0 +1,15 @@
+{
+  "time_range": {
+    "start_time": "2025-03-22T20:44:00.1066262+08:00",
+    "duration": 300
+  },
+  "security_events": {
+    "events": []
+  },
+  "performance_events": {
+    "security_devices": []
+  },
+  "fault_events": {
+    "events": []
+  }
+}

@@ -4,11 +4,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time" // 导入时间包
 
 	"gin-server/config"
-	"gin-server/regist/model"
+	"gin-server/database"
+	"gin-server/database/models"
+	"gin-server/database/repositories"
 
+	// 临时保留，后续完全迁移后可删除
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,65 +23,65 @@ type User struct {
 	GatewayDeviceID string `json:"gatewayDeviceID" binding:"required"`       // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
 	CertID          string `json:"certID"`                                   // 证书ID，允许为 NULL
 	KeyID           string `json:"keyID"`                                    // 密钥ID，允许为 NULL
+	Email           string `json:"email"`                                    // 邮箱，允许为 NULL
 }
 
 // RegisterUser 处理用户注册请求
 func RegisterUser(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到用户注册请求")
+	}
+
 	var user User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息
 		return
 	}
 
-	cfg := config.GetConfig() // 获取全局配置
-
-	// 检查用户 ID 是否存在
-	existsID, err := model.CheckUserExistsByID(user.UserID)
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
 	if err != nil {
-		if cfg.DebugLevel == "true" {
-			log.Printf("无法检查用户 ID 是否存在: %v\n", err) // 记录错误信息
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查用户 ID 是否存在"}) // 返回检查失败信息
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
 		return
 	}
-	if existsID {
-		c.JSON(http.StatusConflict, gin.H{"error": "用户 ID 已存在"}) // 返回冲突错误信息
+	repoFactory := repositories.NewRepositoryFactory(db)
+	userRepo := repoFactory.GetUserRepository()
+
+	// 检查用户 ID 是否存在
+	if _, err := userRepo.FindByID(uint(user.UserID)); err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "用户 ID 已存在"})
 		return
 	}
 
 	// 检查用户名是否存在
-	existsName, err := model.CheckUserExistsByName(user.UserName)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法检查用户名是否存在"}) // 返回检查失败信息
-		return
-	}
-	if existsName {
-		c.JSON(http.StatusConflict, gin.H{"error": "用户名已存在"}) // 返回冲突错误信息
+	if _, err := userRepo.FindByUsername(user.UserName); err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "用户名已存在"})
 		return
 	}
 
-	// 插入用户信息到数据库
-	db := model.GetDB() // 获取数据库连接
-	_, err = db.Exec("INSERT INTO users (userName, passWD, userID, userType, gatewayDeviceID, certID, keyID) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		user.UserName, user.PassWD, user.UserID, user.UserType, user.GatewayDeviceID, user.CertID, user.KeyID)
+	// 创建新用户模型
+	newUser := &models.User{
+		Username:        user.UserName,
+		Password:        user.PassWD,
+		UserID:          user.UserID,
+		UserType:        user.UserType,
+		GatewayDeviceID: user.GatewayDeviceID,
+		Status:          nil, // 默认为 NULL
+		OnlineDuration:  0,   // 默认为 0
+		CertID:          user.CertID,
+		KeyID:           user.KeyID,
+		Email:           user.Email,
+	}
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建用户"}) // 返回创建用户失败信息
+	// 创建用户
+	if err := userRepo.Create(newUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法创建用户"})
 		return
 	}
 
-	// 获取当前时间并格式化为 ISO 8601
-	createdAt := time.Now().Format(time.RFC3339)
-
-	c.JSON(http.StatusCreated, gin.H{
-		"code":    201,
-		"message": "User created", // 返回用户创建成功信息
-		"data": gin.H{
-			"userName":   user.UserName,
-			"userID":     user.UserID,
-			"created_at": createdAt, // 返回实际创建时间
-		},
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "用户注册成功"})
 }
 
 // GetUsers 处理获取所有用户的请求
@@ -90,17 +92,20 @@ func GetUsers(c *gin.Context) {
 		log.Println("接收到获取所有用户的请求")
 	}
 
-	users, err := model.GetAllUsers()
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
 	if err != nil {
-		if cfg.DebugLevel == "true" {
-			log.Printf("获取用户列表失败: %v\n", err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法获取用户列表"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
 		return
 	}
+	repoFactory := repositories.NewRepositoryFactory(db)
+	userRepo := repoFactory.GetUserRepository()
 
-	if cfg.DebugLevel == "true" {
-		log.Printf("成功获取 %d 个用户信息\n", len(users))
+	// 获取所有用户
+	users, err := userRepo.FindAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法获取用户列表"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"users": users})
@@ -114,8 +119,8 @@ func UpdateUser(c *gin.Context) {
 		log.Println("接收到更新用户的请求")
 	}
 
-	var user model.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var requestUser User
+	if err := c.ShouldBindJSON(&requestUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息
 		return
 	}
@@ -127,16 +132,73 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// 更新用户信息
-	updatedFields, err := model.UpdateUser(userID, user)
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法更新用户信息"}) // 返回更新失败信息
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
+		return
+	}
+	repoFactory := repositories.NewRepositoryFactory(db)
+	userRepo := repoFactory.GetUserRepository()
+
+	// 查找用户
+	existingUser, err := userRepo.FindByID(uint(userID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "用户不存在"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code":    200,
-		"message": "User updated successfully", // 返回用户更新成功信息
-		"data":    updatedFields,               // 返回更新的字段
-	})
+	// 更新用户字段
+	existingUser.Username = requestUser.UserName
+	if requestUser.PassWD != "" {
+		existingUser.Password = requestUser.PassWD
+	}
+	existingUser.UserID = requestUser.UserID
+	existingUser.UserType = requestUser.UserType
+	existingUser.GatewayDeviceID = requestUser.GatewayDeviceID
+	existingUser.CertID = requestUser.CertID
+	existingUser.KeyID = requestUser.KeyID
+	existingUser.Email = requestUser.Email
+	// 不更新其他字段，保持原值
+
+	// 保存更新
+	if err := userRepo.Update(existingUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法更新用户信息"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "用户信息更新成功"})
+}
+
+// DeleteUser 处理删除用户的请求
+func DeleteUser(c *gin.Context) {
+	cfg := config.GetConfig() // 获取全局配置
+
+	if cfg.DebugLevel == "true" {
+		log.Println("接收到删除用户的请求")
+	}
+
+	userIDStr := c.Param("id")             // 获取路径参数中的用户 ID
+	userID, err := strconv.Atoi(userIDStr) // 将字符串转换为整数
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的用户 ID"}) // 返回无效用户 ID 错误信息
+		return
+	}
+
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
+		return
+	}
+	repoFactory := repositories.NewRepositoryFactory(db)
+	userRepo := repoFactory.GetUserRepository()
+
+	// 删除用户
+	if err := userRepo.Delete(uint(userID)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法删除用户"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "用户删除成功"})
 }

@@ -23,28 +23,22 @@ func SetupRouter(r *gin.Engine) {
 		}
 	})
 
-	// 用户注册
-	r.POST("/regist/users", handler.RegisterUser)  // 注册用户接口
-	r.GET("/search/users", handler.GetUsers)       // 获取所有用户接口
-	r.PUT("/update/users/:id", handler.UpdateUser) // 更新用户接口
-	// 设备注册
-	r.POST("/regist/devices", handler.RegisterDevice)  // 注册设备接口
-	r.GET("/search/devices", handler.GetDevices)       // 获取所有设备接口
-	r.PUT("/update/devices/:id", handler.UpdateDevice) // 更新设备接口
+	// 用户管理路由
+	r.POST("/regist/users", handler.RegisterUser)      // 注册用户接口
+	r.GET("/search/users", handler.GetUsers)           // 获取所有用户接口
+	r.PUT("/update/users/:id", handler.UpdateUser)     // 更新用户接口
+	r.GET("/search/users/search", handler.GetUserByID) // 根据ID查询用户接口
 
-	// 新增：指定用户和设备查询接口
-	r.GET("/search/user", handler.GetUserByID)     // 根据ID查询用户接口
-	r.GET("/search/device", handler.GetDeviceByID) // 根据ID查询设备接口
+	// 设备管理路由
+	r.POST("/regist/devices", handler.RegisterDevice)      // 注册设备接口
+	r.GET("/search/devices", handler.GetDevices)           // 获取所有设备接口
+	r.PUT("/update/devices/:id", handler.UpdateDevice)     // 更新设备接口
+	r.GET("/search/devices/search", handler.GetDeviceByID) // 根据ID查询设备接口
 
 	// 证书管理路由
-	// 用户证书绑定
-	r.POST("/bind/users/:id/cert", handler.BindUserCert) // 用户证书绑定接口
-	r.POST("/bind/users/:id/key", handler.BindUserKey)   // 用户密钥绑定接口
-
-	// 设备证书绑定
+	r.POST("/bind/users/:id/cert", handler.BindUserCert)     // 用户证书绑定接口
+	r.POST("/bind/users/:id/key", handler.BindUserKey)       // 用户密钥绑定接口
 	r.POST("/bind/devices/:id/cert", handler.BindDeviceCert) // 设备证书绑定接口
 	r.POST("/bind/devices/:id/key", handler.BindDeviceKey)   // 设备密钥绑定接口
-
-	// 获取证书信息
-	r.GET("/cert/info", handler.GetCertInfo) // 获取证书信息接口
+	r.GET("/cert/info", handler.GetCertInfo)                 // 获取证书信息接口
 }

@@ -6,8 +6,10 @@ import (
 	"strconv"
 
 	"gin-server/config"
-	"gin-server/regist/model"
+	"gin-server/database"
+	"gin-server/database/repositories"
 
+	// 临时保留，后续完全迁移后可删除
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,18 +34,21 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
+		return
+	}
+	repoFactory := repositories.NewRepositoryFactory(db)
+	userRepo := repoFactory.GetUserRepository()
+
 	// 查询用户信息
-	user, err := model.GetUserByID(userID)
+	user, err := userRepo.FindByID(uint(userID))
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("查询用户失败: %v\n", err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询用户失败"})
-		return
-	}
-
-	// 如果用户不存在
-	if user == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "用户不存在"})
 		return
 	}
@@ -71,18 +76,21 @@ func GetDeviceByID(c *gin.Context) {
 		return
 	}
 
+	// 获取数据库连接和仓库
+	db, err := database.GetDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库连接失败"})
+		return
+	}
+	repoFactory := repositories.NewRepositoryFactory(db)
+	deviceRepo := repoFactory.GetDeviceRepository()
+
 	// 查询设备信息
-	device, err := model.GetDeviceByID(deviceID)
+	device, err := deviceRepo.FindByDeviceID(deviceID)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("查询设备失败: %v\n", err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "查询设备失败"})
-		return
-	}
-
-	// 如果设备不存在
-	if device == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "设备不存在"})
 		return
 	}

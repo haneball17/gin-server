@@ -12,6 +12,10 @@ type Config struct {
 	// 可选值: "true" - 输出详细调试日志, "false" - 仅输出基本日志
 	DebugLevel string
 
+	// Debug 是否开启调试模式
+	// 控制数据库日志输出等详细信息
+	Debug bool
+
 	// ServerPort 服务器监听端口
 	// 格式: "端口号", 例如: "8080"
 	ServerPort string
@@ -376,6 +380,7 @@ func getEnvBool(key string, defaultValue bool) bool {
 func DefaultConfig() *Config {
 	return &Config{
 		DebugLevel: "false",
+		Debug:      false,
 		ServerPort: "8080",
 		DBUser:     "root",
 		DBPassword: "",

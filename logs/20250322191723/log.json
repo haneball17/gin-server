@@ -1,0 +1,3989 @@
+{
+  "timeRange": {
+    "startTime": "2025-03-22T19:12:23.5200765+08:00",
+    "duration": 300
+  },
+  "securityEvents": {
+    "events": []
+  },
+  "performanceEvents": {
+    "securityDevices": [
+      {
+        "deviceId": "SEC00000001",
+        "cpuUsage": 75,
+        "memoryUsage": 80,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000002",
+        "cpuUsage": 65,
+        "memoryUsage": 70,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000001",
+        "cpuUsage": 75,
+        "memoryUsage": 80,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000002",
+        "cpuUsage": 65,
+        "memoryUsage": 70,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000001",
+        "cpuUsage": 75,
+        "memoryUsage": 80,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000002",
+        "cpuUsage": 65,
+        "memoryUsage": 70,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000001",
+        "cpuUsage": 75,
+        "memoryUsage": 80,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000002",
+        "cpuUsage": 65,
+        "memoryUsage": 70,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000001",
+        "cpuUsage": 75,
+        "memoryUsage": 80,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWA00000001",
+            "cpuUsage": 60,
+            "memoryUsage": 65,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              },
+              {
+                "userId": 10001,
+                "status": 1,
+                "onlineDuration": 1800,
+                "behaviors": []
+              },
+              {
+                "userId": 10002,
+                "status": 1,
+                "onlineDuration": 2400,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000001",
+            "cpuUsage": 55,
+            "memoryUsage": 60,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              },
+              {
+                "userId": 10003,
+                "status": 1,
+                "onlineDuration": 3000,
+                "behaviors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "deviceId": "SEC00000002",
+        "cpuUsage": 65,
+        "memoryUsage": 70,
+        "onlineDuration": 3600,
+        "status": 1,
+        "gatewayDevices": [
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          },
+          {
+            "deviceId": "GWA00000002",
+            "cpuUsage": 70,
+            "memoryUsage": 75,
+            "onlineDuration": 3600,
+            "status": 1,
+            "users": [
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              },
+              {
+                "userId": 10004,
+                "status": 2,
+                "onlineDuration": 0,
+                "behaviors": []
+              }
+            ]
+          },
+          {
+            "deviceId": "GWB00000002",
+            "cpuUsage": 0,
+            "memoryUsage": 0,
+            "onlineDuration": 0,
+            "status": 2,
+            "users": []
+          }
+        ]
+      },
+      {
+        "deviceId": "SA0000000003",
+        "cpuUsage": 0,
+        "memoryUsage": 0,
+        "onlineDuration": 0,
+        "status": 2,
+        "gatewayDevices": []
+      }
+    ]
+  },
+  "faultEvents": {
+    "events": []
+  }
+}
