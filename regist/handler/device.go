@@ -16,18 +16,27 @@ import (
 
 // Device 结构体定义设备信息
 type Device struct {
-	DeviceName                string  `json:"deviceName" binding:"required,min=4,max=50"` // 设备名称，长度限制，注册时需要
-	DeviceType                int     `json:"deviceType" binding:"required"`              // 设备类型，1代表网关设备A型，2代表网关设备B型，3代表网关设备C型，4代表安全接入管理设备，注册时需要
-	PassWD                    string  `json:"passWD" binding:"required,min=8"`            // 设备登录口令，注册时需要
-	DeviceID                  int     `json:"deviceID" binding:"required"`                // 设备唯一标识，注册时需要
-	SuperiorDeviceID          int     `json:"superiorDeviceID" binding:"required"`        // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为0
-	CertID                    string  `json:"certID"`                                     // 证书ID，允许为 NULL
-	KeyID                     string  `json:"keyID"`                                      // 密钥ID，允许为 NULL
-	DeviceStatus              int     `json:"deviceStatus"`                               // 设备状态，注册时需要
-	RegisterIP                string  `json:"registerIP"`                                 // 注册IP，注册时需要
-	Email                     string  `json:"email"`                                      // 邮箱，注册时需要
-	DeviceHardwareFingerprint *string `json:"deviceHardwareFingerprint"`                  // 设备硬件指纹，允许为 NULL
-	AnonymousUser             *string `json:"anonymousUser"`                              // 匿名用户，允许为 NULL
+	DeviceName          string  `json:"device_name" binding:"required,min=4,max=50"` // 设备名称，长度限制，注册时需要
+	DeviceType          int     `json:"device_type" binding:"required"`              // 设备类型，1代表网关设备A型，2代表网关设备B型，3代表网关设备C型，4代表安全接入管理设备，注册时需要
+	PassWD              string  `json:"pass_wd" binding:"required,min=8"`            // 设备登录口令，注册时需要
+	DeviceID            int     `json:"device_id" binding:"required"`                // 设备唯一标识，注册时需要
+	SuperiorDeviceID    int     `json:"superior_device_id" binding:"required"`       // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为0
+	CertID              string  `json:"cert_id"`                                     // 证书ID，允许为 NULL
+	KeyID               string  `json:"key_id"`                                      // 密钥ID，允许为 NULL
+	DeviceStatus        int     `json:"device_status"`                               // 设备状态，注册时需要
+	RegisterIP          string  `json:"register_ip"`                                 // 注册IP，注册时需要
+	Email               string  `json:"email"`                                       // 邮箱，注册时需要
+	HardwareFingerprint *string `json:"hardware_fingerprint"`                        // 设备硬件指纹，允许为 NULL
+	AnonymousUser       *string `json:"anonymous_user"`                              // 匿名用户，允许为 NULL
+}
+
+// DeviceRegisterRequest 简化的设备注册请求结构体
+type DeviceRegisterRequest struct {
+	DeviceName       string `json:"device_name" binding:"required,min=4,max=50"` // 设备名称，长度限制，注册时需要
+	DeviceType       int    `json:"device_type" binding:"required"`              // 设备类型，1代表网关设备A型，2代表网关设备B型，3代表网关设备C型，4代表安全接入管理设备，注册时需要
+	PassWD           string `json:"pass_wd" binding:"required,min=8"`            // 设备登录口令，注册时需要
+	DeviceID         int    `json:"device_id" binding:"required"`                // 设备唯一标识，注册时需要
+	SuperiorDeviceID int    `json:"superior_device_id" `                         // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为0
 }
 
 // RegisterDevice 处理设备注册请求
@@ -38,8 +47,8 @@ func RegisterDevice(c *gin.Context) {
 		log.Println("接收到设备注册请求")
 	}
 
-	var device Device
-	if err := c.ShouldBindJSON(&device); err != nil {
+	var request DeviceRegisterRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息
 		return
 	}
@@ -54,14 +63,14 @@ func RegisterDevice(c *gin.Context) {
 	deviceRepo := repoFactory.GetDeviceRepository()
 
 	// 检查设备 ID 是否存在
-	existingDevice, err := deviceRepo.FindByDeviceID(device.DeviceID)
+	existingDevice, err := deviceRepo.FindByDeviceID(request.DeviceID)
 	if err == nil && existingDevice != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "设备 ID 已存在"})
 		return
 	}
 
 	// 检查设备名称是否存在
-	existingDeviceByName, err := deviceRepo.FindByDeviceName(device.DeviceName)
+	existingDeviceByName, err := deviceRepo.FindByDeviceName(request.DeviceName)
 	if err == nil && existingDeviceByName != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "设备名称已存在"})
 		return
@@ -69,25 +78,16 @@ func RegisterDevice(c *gin.Context) {
 
 	// 创建新设备模型
 	newDevice := &models.Device{
-		DeviceName:       device.DeviceName,
-		DeviceType:       device.DeviceType,
-		Password:         device.PassWD,
-		DeviceID:         device.DeviceID,
-		SuperiorDeviceID: device.SuperiorDeviceID,
-		DeviceStatus:     device.DeviceStatus,
-		CertID:           device.CertID,
-		KeyID:            device.KeyID,
-		RegisterIP:       device.RegisterIP,
-		Email:            device.Email,
-	}
-
-	// 处理可能为nil的指针字段
-	if device.DeviceHardwareFingerprint != nil {
-		newDevice.HardwareFingerprint = *device.DeviceHardwareFingerprint
-	}
-
-	if device.AnonymousUser != nil {
-		newDevice.AnonymousUser = *device.AnonymousUser
+		DeviceName:       request.DeviceName,
+		DeviceType:       request.DeviceType,
+		Password:         request.PassWD,
+		DeviceID:         request.DeviceID,
+		SuperiorDeviceID: request.SuperiorDeviceID,
+		DeviceStatus:     2, // 默认离线状态
+		CertID:           "",
+		KeyID:            "",
+		RegisterIP:       c.ClientIP(), // 自动获取客户端IP
+		Email:            "",
 	}
 
 	// 创建设备
@@ -96,7 +96,11 @@ func RegisterDevice(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "设备注册成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "设备注册成功",
+		"data":    newDevice,
+	})
 }
 
 // GetDevices 处理获取所有设备的请求
@@ -182,8 +186,8 @@ func UpdateDevice(c *gin.Context) {
 	existingDevice.Email = device.Email
 
 	// 处理可能为nil的指针字段
-	if device.DeviceHardwareFingerprint != nil {
-		existingDevice.HardwareFingerprint = *device.DeviceHardwareFingerprint
+	if device.HardwareFingerprint != nil {
+		existingDevice.HardwareFingerprint = *device.HardwareFingerprint
 	}
 
 	if device.AnonymousUser != nil {
@@ -196,7 +200,11 @@ func UpdateDevice(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "设备信息更新成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "设备信息更新成功",
+		"data":    existingDevice,
+	})
 }
 
 // DeleteDevice 处理删除设备的请求
@@ -239,5 +247,8 @@ func DeleteDevice(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "设备删除成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "设备删除成功",
+	})
 }

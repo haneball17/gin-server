@@ -280,7 +280,7 @@ func InitConfig() {
 		DebugLevel: getEnv("DEBUG_LEVEL", "true"),
 
 		// 服务器配置
-		ServerPort: getEnv("SERVER_PORT", "8080"),
+		ServerPort: getEnv("SERVER_PORT", "8123"),
 
 		// 主数据库配置
 		DBUser:     getEnv("DB_USER", "gin_user"),
@@ -427,7 +427,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		DebugLevel: "false",
 		Debug:      false,
-		ServerPort: "8080",
+		ServerPort: "8123",
 		DBUser:     "root",
 		DBPassword: "",
 		DBHost:     "localhost",

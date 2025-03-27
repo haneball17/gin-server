@@ -16,14 +16,14 @@ import (
 
 // User 结构体定义用户信息
 type User struct {
-	UserName        string `json:"userName" binding:"required,min=4,max=20"` // 用户名，必填，长度限制，注册时需要
-	PassWD          string `json:"passWD" binding:"required,min=8"`          // 密码，必填，长度限制，注册时需要
-	UserID          int    `json:"userID" binding:"required"`                // 用户唯一标识，必填，注册时需要
-	UserType        int    `json:"userType" binding:"required"`              // 用户类型，注册时需要
-	GatewayDeviceID int    `json:"gatewayDeviceID" binding:"required"`       // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
-	CertID          string `json:"certID"`                                   // 证书ID，允许为 NULL
-	KeyID           string `json:"keyID"`                                    // 密钥ID，允许为 NULL
-	Email           string `json:"email"`                                    // 邮箱，允许为 NULL
+	UserName        string `json:"user_name" binding:"required,min=4,max=20"` // 用户名，必填，长度限制，注册时需要
+	PassWD          string `json:"pass_wd" binding:"required,min=8"`          // 密码，必填，长度限制，注册时需要
+	UserID          int    `json:"user_id" binding:"required"`                // 用户唯一标识，必填，注册时需要
+	UserType        int    `json:"user_type" binding:"required"`              // 用户类型，注册时需要
+	GatewayDeviceID int    `json:"gateway_device_id" binding:"required"`      // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
+	CertID          string `json:"cert_id"`                                   // 证书ID，允许为 NULL
+	KeyID           string `json:"key_id"`                                    // 密钥ID，允许为 NULL
+	Email           string `json:"email"`                                     // 邮箱，允许为 NULL
 }
 
 // RegisterUser 处理用户注册请求
@@ -81,7 +81,11 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "用户注册成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "用户注册成功",
+		"data":    newUser,
+	})
 }
 
 // GetUsers 处理获取所有用户的请求
@@ -108,7 +112,11 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"users": users})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "获取用户列表成功",
+		"data":    users,
+	})
 }
 
 // UpdateUser 处理用户修改请求
@@ -167,7 +175,11 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "用户信息更新成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "用户信息更新成功",
+		"data":    existingUser,
+	})
 }
 
 // DeleteUser 处理删除用户的请求
@@ -200,5 +212,8 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "用户删除成功"})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "用户删除成功",
+	})
 }
