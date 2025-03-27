@@ -71,6 +71,10 @@ type Config struct {
 	// FTP FTP服务器配置
 	// 用于远程文件传输
 	FTP *FTPConfig `json:"ftp" yaml:"ftp"`
+
+	// TestData 测试数据配置
+	// 用于控制测试数据的生成和维护
+	TestData TestDataConfig
 }
 
 // ConfigManagerConfig 配置管理模块配置结构体
@@ -209,6 +213,37 @@ type FTPConfig struct {
 	Password string `json:"password" yaml:"password"`
 }
 
+// TestDataConfig 测试数据配置结构体
+type TestDataConfig struct {
+	// EnableInitialData 是否在启动时初始化测试数据
+	// true: 启动时自动添加测试数据, false: 不添加测试数据
+	EnableInitialData bool `json:"enable_initial_data" yaml:"enable_initial_data"`
+
+	// EnableRealtimeData 是否启用实时测试数据生成
+	// true: 启用实时测试数据生成, false: 不生成实时测试数据
+	EnableRealtimeData bool `json:"enable_realtime_data" yaml:"enable_realtime_data"`
+
+	// DeviceCount 生成的设备数量
+	// 至少需要生成10条设备数据
+	DeviceCount int `json:"device_count" yaml:"device_count"`
+
+	// UsersPerDevice 每个设备的用户数量
+	// 每个网关至少需要5个用户
+	UsersPerDevice int `json:"users_per_device" yaml:"users_per_device"`
+
+	// BehaviorsPerUser 每个用户的行为数据量
+	// 每个用户至少需要10条行为数据
+	BehaviorsPerUser int `json:"behaviors_per_user" yaml:"behaviors_per_user"`
+
+	// RealtimeInterval 实时数据生成间隔(秒)
+	// 默认60秒，即每分钟生成一次
+	RealtimeInterval int `json:"realtime_interval" yaml:"realtime_interval"`
+
+	// RealtimeBehaviorsPerInterval 每个间隔生成的行为数据量
+	// 默认10条，即每分钟为每个测试用户添加10条数据
+	RealtimeBehaviorsPerInterval int `json:"realtime_behaviors_per_interval" yaml:"realtime_behaviors_per_interval"`
+}
+
 // EncryptionConfig 加密配置结构体
 type EncryptionConfig struct {
 	// AESKeyLength AES密钥长度
@@ -312,6 +347,17 @@ func InitConfig() {
 				IncludePatterns:  []string{},
 				ExcludePatterns:  []string{},
 			},
+		},
+
+		// 测试数据配置
+		TestData: TestDataConfig{
+			EnableInitialData:            getEnvBool("TEST_ENABLE_INITIAL_DATA", true),
+			EnableRealtimeData:           getEnvBool("TEST_ENABLE_REALTIME_DATA", false),
+			DeviceCount:                  getEnvInt("TEST_DEVICE_COUNT", 10),
+			UsersPerDevice:               getEnvInt("TEST_USERS_PER_DEVICE", 5),
+			BehaviorsPerUser:             getEnvInt("TEST_BEHAVIORS_PER_USER", 10),
+			RealtimeInterval:             getEnvInt("TEST_REALTIME_INTERVAL", 60),
+			RealtimeBehaviorsPerInterval: getEnvInt("TEST_REALTIME_BEHAVIORS_PER_INTERVAL", 10),
 		},
 	}
 
@@ -434,6 +480,15 @@ func DefaultConfig() *Config {
 				IncludePatterns:  []string{},
 				ExcludePatterns:  []string{},
 			},
+		},
+		TestData: TestDataConfig{
+			EnableInitialData:            true,
+			EnableRealtimeData:           false,
+			DeviceCount:                  10,
+			UsersPerDevice:               5,
+			BehaviorsPerUser:             10,
+			RealtimeInterval:             60,
+			RealtimeBehaviorsPerInterval: 10,
 		},
 	}
 }

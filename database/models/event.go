@@ -18,7 +18,7 @@ const (
 type Event struct {
 	gorm.Model
 	EventID   int64     `json:"event_id" gorm:"column:event_id;uniqueIndex"`
-	DeviceID  string    `json:"device_id" gorm:"column:device_id;index;type:varchar(128)"`
+	DeviceID  int       `json:"device_id" gorm:"column:device_id;index"`
 	EventTime time.Time `json:"event_time" gorm:"column:event_time;index"`
 	EventType EventType `json:"event_type" gorm:"column:event_type;index"`
 	EventCode string    `json:"event_code" gorm:"column:event_code;type:varchar(64)"`

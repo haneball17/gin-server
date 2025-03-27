@@ -20,7 +20,7 @@ type User struct {
 	PassWD          string `json:"passWD" binding:"required,min=8"`          // 密码，必填，长度限制，注册时需要
 	UserID          int    `json:"userID" binding:"required"`                // 用户唯一标识，必填，注册时需要
 	UserType        int    `json:"userType" binding:"required"`              // 用户类型，注册时需要
-	GatewayDeviceID string `json:"gatewayDeviceID" binding:"required"`       // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
+	GatewayDeviceID int    `json:"gatewayDeviceID" binding:"required"`       // 用户所属网关设备ID，注册时需要，作为外键关联到设备表
 	CertID          string `json:"certID"`                                   // 证书ID，允许为 NULL
 	KeyID           string `json:"keyID"`                                    // 密钥ID，允许为 NULL
 	Email           string `json:"email"`                                    // 邮箱，允许为 NULL

@@ -70,9 +70,19 @@ func GetDeviceByID(c *gin.Context) {
 	cfg := config.GetConfig() // 获取全局配置
 
 	// 获取查询参数中的设备ID
-	deviceID := c.Query("id")
-	if deviceID == "" {
+	deviceIDStr := c.Query("id")
+	if deviceIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "缺少必要的id参数"})
+		return
+	}
+
+	// 将设备ID从字符串转换为整数
+	deviceID, err := strconv.Atoi(deviceIDStr)
+	if err != nil {
+		if cfg.DebugLevel == "true" {
+			log.Printf("无效的设备ID格式: %s, %v\n", deviceIDStr, err)
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
 		return
 	}
 
@@ -96,7 +106,7 @@ func GetDeviceByID(c *gin.Context) {
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Printf("成功查询到设备ID为 %s 的信息\n", deviceID)
+		log.Printf("成功查询到设备ID为 %d 的信息\n", deviceID)
 	}
 
 	// 返回设备信息

@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"gin-server/config"
 	"gin-server/database"
@@ -18,8 +19,8 @@ type Device struct {
 	DeviceName                string  `json:"deviceName" binding:"required,min=4,max=50"` // 设备名称，长度限制，注册时需要
 	DeviceType                int     `json:"deviceType" binding:"required"`              // 设备类型，1代表网关设备A型，2代表网关设备B型，3代表网关设备C型，4代表安全接入管理设备，注册时需要
 	PassWD                    string  `json:"passWD" binding:"required,min=8"`            // 设备登录口令，注册时需要
-	DeviceID                  string  `json:"deviceID" binding:"required"`                // 设备唯一标识，注册时需要
-	SuperiorDeviceID          string  `json:"superiorDeviceID" binding:"required"`        // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为空
+	DeviceID                  int     `json:"deviceID" binding:"required"`                // 设备唯一标识，注册时需要
+	SuperiorDeviceID          int     `json:"superiorDeviceID" binding:"required"`        // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为0
 	CertID                    string  `json:"certID"`                                     // 证书ID，允许为 NULL
 	KeyID                     string  `json:"keyID"`                                      // 密钥ID，允许为 NULL
 	DeviceStatus              int     `json:"deviceStatus"`                               // 设备状态，注册时需要
@@ -118,14 +119,18 @@ func GetDevices(c *gin.Context) {
 	// 获取所有设备
 	devices, err := deviceRepo.FindAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法获取设备列表"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取设备列表失败"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"devices": devices})
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "获取设备列表成功",
+		"data":    devices,
+	})
 }
 
-// UpdateDevice 处理设备修改请求
+// UpdateDevice 处理更新设备的请求
 func UpdateDevice(c *gin.Context) {
 	cfg := config.GetConfig() // 获取全局配置
 
@@ -133,13 +138,21 @@ func UpdateDevice(c *gin.Context) {
 		log.Println("接收到更新设备的请求")
 	}
 
+	// 获取路径参数中的设备 ID
+	deviceIDStr := c.Param("id")
+
+	// 转换设备ID为整数
+	deviceID, err := strconv.Atoi(deviceIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
+		return
+	}
+
 	var device Device
 	if err := c.ShouldBindJSON(&device); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}) // 返回参数错误信息
 		return
 	}
-
-	deviceID := c.Param("id") // 获取路径参数中的设备 ID
 
 	// 获取数据库连接和仓库
 	db, err := database.GetDB()
@@ -160,9 +173,7 @@ func UpdateDevice(c *gin.Context) {
 	// 更新设备字段
 	existingDevice.DeviceName = device.DeviceName
 	existingDevice.DeviceType = device.DeviceType
-	if device.PassWD != "" {
-		existingDevice.Password = device.PassWD
-	}
+	existingDevice.Password = device.PassWD
 	existingDevice.SuperiorDeviceID = device.SuperiorDeviceID
 	existingDevice.DeviceStatus = device.DeviceStatus
 	existingDevice.CertID = device.CertID
@@ -196,7 +207,15 @@ func DeleteDevice(c *gin.Context) {
 		log.Println("接收到删除设备的请求")
 	}
 
-	deviceID := c.Param("id") // 获取路径参数中的设备 ID
+	// 获取路径参数中的设备 ID
+	deviceIDStr := c.Param("id")
+
+	// 转换设备ID为整数
+	deviceID, err := strconv.Atoi(deviceIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
+		return
+	}
 
 	// 获取数据库连接和仓库
 	db, err := database.GetDB()

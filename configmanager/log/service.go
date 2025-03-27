@@ -22,7 +22,7 @@ type LogService interface {
 	GetLogFilesByTimeRange(startTime, endTime time.Time) ([]models.LogFile, int64, error)
 
 	// CreateEvent 创建事件记录
-	CreateEvent(eventCode string, eventDesc string, deviceID string, eventType models.EventType) (*models.Event, error)
+	CreateEvent(eventCode string, eventDesc string, deviceID int, eventType models.EventType) (*models.Event, error)
 
 	// GetEventsByTimeRange 根据时间范围获取事件
 	GetEventsByTimeRange(startTime, endTime time.Time) ([]models.Event, int64, error)
@@ -83,7 +83,7 @@ func (s *logService) GetLogFilesByTimeRange(startTime, endTime time.Time) ([]mod
 }
 
 // CreateEvent 创建事件记录
-func (s *logService) CreateEvent(eventCode string, eventDesc string, deviceID string, eventType models.EventType) (*models.Event, error) {
+func (s *logService) CreateEvent(eventCode string, eventDesc string, deviceID int, eventType models.EventType) (*models.Event, error) {
 	repo := s.repoFactory.GetEventRepository()
 
 	// 创建事件记录

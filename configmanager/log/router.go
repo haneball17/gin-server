@@ -105,7 +105,7 @@ func RegisterRoutes(router *gin.Engine, logManager *LogManager) {
 			type EventRequest struct {
 				EventCode string `json:"event_code" binding:"required"`
 				EventDesc string `json:"event_desc" binding:"required"`
-				DeviceID  string `json:"device_id"`
+				DeviceID  int    `json:"device_id"`
 				EventType int    `json:"event_type" binding:"required"`
 			}
 

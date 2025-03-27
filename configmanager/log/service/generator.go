@@ -182,7 +182,7 @@ func (g *Generator) getSecurityDevices(startTime, endTime time.Time) ([]models.S
 }
 
 // getGatewayDevices 获取网关设备
-func (g *Generator) getGatewayDevices(securityDeviceID string, startTime, endTime time.Time) ([]models.GatewayDevice, error) {
+func (g *Generator) getGatewayDevices(securityDeviceID int, startTime, endTime time.Time) ([]models.GatewayDevice, error) {
 	var gatewayDevices []models.GatewayDevice
 
 	// 查询所有隶属于指定安全接入管理设备的网关设备
@@ -218,7 +218,7 @@ func (g *Generator) getGatewayDevices(securityDeviceID string, startTime, endTim
 }
 
 // getUsers 获取用户
-func (g *Generator) getUsers(gatewayDeviceID string, startTime, endTime time.Time) ([]models.UserInfo, error) {
+func (g *Generator) getUsers(gatewayDeviceID int, startTime, endTime time.Time) ([]models.UserInfo, error) {
 	var userInfos []models.UserInfo
 
 	// 查询所有隶属于指定网关设备的用户

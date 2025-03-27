@@ -12,7 +12,7 @@ type DeviceRepository interface {
 	// FindByID 根据ID查找设备
 	FindByID(id uint) (*models.Device, error)
 	// FindByDeviceID 根据设备ID查找设备
-	FindByDeviceID(deviceID string) (*models.Device, error)
+	FindByDeviceID(deviceID int) (*models.Device, error)
 	// FindByDeviceName 根据设备名称查找设备
 	FindByDeviceName(deviceName string) (*models.Device, error)
 	// FindAll 查找所有设备
@@ -54,7 +54,7 @@ func (r *deviceRepository) FindByID(id uint) (*models.Device, error) {
 }
 
 // FindByDeviceID 根据设备ID查找设备
-func (r *deviceRepository) FindByDeviceID(deviceID string) (*models.Device, error) {
+func (r *deviceRepository) FindByDeviceID(deviceID int) (*models.Device, error) {
 	var device models.Device
 	if err := r.GetDB().Where("device_id = ?", deviceID).First(&device).Error; err != nil {
 		return nil, err

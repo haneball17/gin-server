@@ -105,7 +105,7 @@ func migrateOldTables(db *gorm.DB) error {
 		Name: "events",
 		Columns: []Column{
 			{Name: "event_id", Type: "BIGINT", PrimaryKey: true, Nullable: false, Comment: "事件ID"},
-			{Name: "device_id", Type: "VARCHAR(12)", Nullable: false, Comment: "设备ID"},
+			{Name: "device_id", Type: "INT", Nullable: false, Comment: "设备ID"},
 			{Name: "event_time", Type: "DATETIME", Nullable: false, Comment: "事件发生时间"},
 			{Name: "event_type", Type: "INT", Nullable: false, Comment: "事件类型，1:安全事件，2:故障事件"},
 			{Name: "event_code", Type: "VARCHAR(20)", Nullable: false, Comment: "事件代码"},

@@ -262,8 +262,15 @@ func BindDeviceCert(c *gin.Context) {
 	deviceRepo := repoFactory.GetDeviceRepository()
 	certRepo := repoFactory.GetCertRepository()
 
+	// 将设备ID从字符串转换为整数
+	deviceIDInt, err := strconv.Atoi(deviceID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
+		return
+	}
+
 	// 检查设备是否存在
-	device, err := deviceRepo.FindByDeviceID(deviceID)
+	device, err := deviceRepo.FindByDeviceID(deviceIDInt)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("检查设备是否存在失败: %v\n", err)
@@ -363,8 +370,15 @@ func BindDeviceKey(c *gin.Context) {
 	deviceRepo := repoFactory.GetDeviceRepository()
 	certRepo := repoFactory.GetCertRepository()
 
+	// 将设备ID从字符串转换为整数
+	deviceIDInt, err := strconv.Atoi(deviceID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
+		return
+	}
+
 	// 检查设备是否存在
-	device, err := deviceRepo.FindByDeviceID(deviceID)
+	device, err := deviceRepo.FindByDeviceID(deviceIDInt)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("检查设备是否存在失败: %v\n", err)
@@ -490,7 +504,13 @@ func GetCertInfo(c *gin.Context) {
 		exists = (err == nil)
 	} else {
 		deviceRepo := repoFactory.GetDeviceRepository()
-		_, err = deviceRepo.FindByDeviceID(entityID)
+		// 将设备ID从字符串转换为整数
+		deviceIDInt, err := strconv.Atoi(entityID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "无效的设备ID格式"})
+			return
+		}
+		_, err = deviceRepo.FindByDeviceID(deviceIDInt)
 		exists = (err == nil)
 	}
 

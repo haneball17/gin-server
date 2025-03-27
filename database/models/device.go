@@ -10,8 +10,8 @@ type Device struct {
 	DeviceName          string `json:"device_name" gorm:"column:device_name;not null;type:varchar(128)"`
 	DeviceType          int    `json:"device_type" gorm:"column:device_type;not null"`
 	Password            string `json:"password" gorm:"column:pass_wd;not null;type:varchar(128)"`
-	DeviceID            string `json:"device_id" gorm:"column:device_id;uniqueIndex;not null;type:varchar(128)"`
-	SuperiorDeviceID    string `json:"superior_device_id" gorm:"column:superior_device_id;type:varchar(128)"`
+	DeviceID            int    `json:"device_id" gorm:"column:device_id;uniqueIndex;not null"`
+	SuperiorDeviceID    int    `json:"superior_device_id" gorm:"column:superior_device_id"`
 	DeviceStatus        int    `json:"device_status" gorm:"column:device_status;default:2"` // 默认离线状态
 	PeakCPUUsage        int    `json:"peak_cpu_usage" gorm:"column:peak_cpu_usage;default:0"`
 	PeakMemoryUsage     int    `json:"peak_memory_usage" gorm:"column:peak_memory_usage;default:0"`

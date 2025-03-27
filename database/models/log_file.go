@@ -57,7 +57,7 @@ type LogContent struct {
 
 // SecurityDevice 安全接入管理设备（不映射到数据库表）
 type SecurityDevice struct {
-	DeviceID       string          `json:"device_id"`       // 安全接入管理设备id
+	DeviceID       int             `json:"device_id"`       // 安全接入管理设备id
 	CPUUsage       int             `json:"cpu_usage"`       // 峰值CPU占用率
 	MemoryUsage    int             `json:"memory_usage"`    // 峰值内存使用率
 	OnlineDuration int             `json:"online_duration"` // 设备在线时间
@@ -67,7 +67,7 @@ type SecurityDevice struct {
 
 // GatewayDevice 网关设备（不映射到数据库表）
 type GatewayDevice struct {
-	DeviceID       string     `json:"device_id"`       // 网关设备id
+	DeviceID       int        `json:"device_id"`       // 网关设备id
 	CPUUsage       int        `json:"cpu_usage"`       // 峰值CPU占用率
 	MemoryUsage    int        `json:"memory_usage"`    // 峰值内存使用率
 	OnlineDuration int        `json:"online_duration"` // 设备在线时间

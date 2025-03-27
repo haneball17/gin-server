@@ -345,7 +345,7 @@ func (m *LogManager) GetEventsByTimeRange(startTime, endTime time.Time) ([]model
 }
 
 // CreateEvent 创建事件记录
-func (m *LogManager) CreateEvent(eventCode string, eventDesc string, deviceID string, eventType models.EventType) (*models.Event, error) {
+func (m *LogManager) CreateEvent(eventCode string, eventDesc string, deviceID int, eventType models.EventType) (*models.Event, error) {
 	return m.logService.CreateEvent(eventCode, eventDesc, deviceID, eventType)
 }
 

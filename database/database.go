@@ -5,6 +5,7 @@ import (
 	"gin-server/config"
 	"gin-server/database/connections"
 	"gin-server/database/migrations"
+	"gin-server/database/testdata"
 	"log"
 	"sync"
 
@@ -22,6 +23,7 @@ var (
 // 1. 创建数据库连接管理器
 // 2. 检查并创建所有必要的表结构
 // 3. 执行必要的迁移任务
+// 4. 初始化测试数据（如果配置中开启）
 func Initialize(cfg *config.Config) error {
 	// 初始化连接管理器（使用once确保只初始化一次）
 	once.Do(func() {
@@ -61,10 +63,33 @@ func Initialize(cfg *config.Config) error {
 		return fmt.Errorf("确保关键表存在失败: %w", err)
 	}
 
+	// 初始化测试数据（如果配置中开启）
+	if err := initializeTestData(cfg, db); err != nil {
+		log.Printf("初始化测试数据警告: %v", err)
+		// 这里只记录警告，不中断程序运行，因为测试数据不是核心功能
+	}
+
 	if cfg.DebugLevel == "true" {
 		log.Println("数据库初始化完成")
 	}
 
+	return nil
+}
+
+// initializeTestData 初始化测试数据
+func initializeTestData(cfg *config.Config, db *gorm.DB) error {
+	if cfg.DebugLevel == "true" {
+		log.Println("开始初始化测试数据...")
+	}
+
+	// 调用testdata包的初始化函数
+	if err := testdata.Initialize(cfg, db); err != nil {
+		return fmt.Errorf("初始化测试数据失败: %w", err)
+	}
+
+	if cfg.DebugLevel == "true" {
+		log.Println("测试数据初始化完成")
+	}
 	return nil
 }
 
@@ -109,6 +134,10 @@ func GetRadiusDB() (*gorm.DB, error) {
 
 // CloseAll 关闭所有数据库连接
 func CloseAll() error {
+	// 先关闭测试数据模块
+	testdata.Shutdown()
+
+	// 再关闭数据库连接
 	if manager != nil {
 		return manager.CloseAll()
 	}
