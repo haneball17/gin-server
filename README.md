@@ -618,49 +618,48 @@
 - **响应示例 (成功)**:
   ```json
   {
-    "timeRange": {
-      "startTime": "2024-03-07T10:00:00Z",
+    "time_range": {
+      "start_time": "2024-03-07T10:00:00Z",
       "duration": 300
     },
-    "securityEvents": {
+    "security_events": {
       "events": [
         {
-          "eventId": 1001,
-          "deviceId": "1001",
-          "eventTime": "2024-03-07T10:02:00Z",
-          "eventType": 1,
-          "eventCode": "SEC_001",
-          "eventDesc": "异常登录尝试",
-          "createdAt": "2024-03-07T10:02:01Z"
+          "event_id": 1001,
+          "device_id": "1001",
+          "event_time": "2024-03-07T10:02:00Z",
+          "event_type": 1,
+          "event_code": "SEC_001",
+          "event_desc": "异常登录尝试"
         }
       ]
     },
-    "performanceEvents": {
-      "securityDevices": [
+    "performance_events": {
+      "security_devices": [
         {
-          "deviceId": "1001",
-          "cpuUsage": 45,
-          "memoryUsage": 60,
-          "onlineDuration": 3600,
+          "device_id": "1001",
+          "cpu_usage": 45,
+          "memory_usage": 60,
+          "online_duration": 3600,
           "status": 1,
-          "gatewayDevices": [
+          "gateway_devices": [
             {
-              "deviceId": "1002",
-              "cpuUsage": 30,
-              "memoryUsage": 40,
-              "onlineDuration": 3600,
+              "device_id": "1002",
+              "cpu_usage": 30,
+              "memory_usage": 40,
+              "online_duration": 3600,
               "status": 1,
               "users": [
                 {
-                  "userId": 10001,
+                  "user_id": 10001,
                   "status": 1,
-                  "onlineDuration": 1800,
+                  "online_duration": 1800,
                   "behaviors": [
                     {
                       "time": "2024-03-07T10:01:00Z",
                       "type": 1,
-                      "dataType": 1,
-                      "dataSize": 1024
+                      "data_type": 1,
+                      "data_size": 1024
                     }
                   ]
                 }
@@ -670,16 +669,15 @@
         }
       ]
     },
-    "faultEvents": {
+    "fault_events": {
       "events": [
         {
-          "eventId": 2001,
-          "deviceId": "1002",
-          "eventTime": "2024-03-07T10:03:00Z",
-          "eventType": 2,
-          "eventCode": "FAULT_001",
-          "eventDesc": "设备离线",
-          "createdAt": "2024-03-07T10:03:01Z"
+          "event_id": 2001,
+          "device_id": "1002",
+          "event_time": "2024-03-07T10:03:00Z",
+          "event_type": 2,
+          "event_code": "FAULT_001",
+          "event_desc": "设备离线"
         }
       ]
     }
@@ -838,14 +836,15 @@
 - **响应示例 (成功)**:
   ```json
   {
-    "ID": 1,
-    "CreatedAt": "2024-03-07T15:04:05Z",
-    "UpdatedAt": "2024-03-07T15:04:05Z",
-    "user_id": 10001,
-    "behavior_time": "2024-03-07T15:04:05Z",
-    "behavior_type": 1,
-    "data_type": 1,
-    "data_size": 1024
+    "code": 200,
+    "message": "用户行为记录成功",
+    "data": {
+      "user_id": 10001,
+      "behavior_time": "2024-03-07T15:04:05Z",
+      "behavior_type": 1,
+      "data_type": 1,
+      "data_size": 1024
+    }
   }
   ```
 
@@ -859,20 +858,20 @@
 - **响应示例**:
   ```json
   {
-    "total": 10,
-    "behaviors": [
-      {
-        "ID": 1,
-        "CreatedAt": "2024-03-07T15:04:05Z",
-        "UpdatedAt": "2024-03-07T15:04:05Z",
-        "user_id": 10001,
-        "behavior_time": "2024-03-07T15:04:05Z",
-        "behavior_type": 1,
-        "data_type": 1,
-        "data_size": 1024
-      }
-    ],
-    "user_id": 10001
+    "code": 200,
+    "message": "查询成功",
+    "data": {
+      "total": 10,
+      "behaviors": [
+        {
+          "behavior_time": "2024-03-07T15:04:05Z",
+          "behavior_type": 1,
+          "data_type": 1,
+          "data_size": 1024
+        }
+      ],
+      "user_id": 10001
+    }
   }
   ```
 
@@ -880,11 +879,11 @@
 
 ### 日志文件结构
 
-系统生成的日志文件采用JSON格式，包含以下主要部分：
+系统生成的日志文件采用JSON格式，遵循以下标准化结构：
 
 #### 1. 时间范围（time_range）
 
-- **start_time**: 统计起始时间，ISO8601格式（例如："2025-03-27T20:14:40.6911388+08:00"）
+- **start_time**: 统计起始时间，ISO8601格式（例如："2025-03-27T20:14:40.691Z"）
 - **duration**: 统计时长（秒），即日志覆盖的时间段
 
 #### 2. 安全事件（security_events）
@@ -892,7 +891,7 @@
 - **events**: 安全事件列表，包含安全相关的告警和事件
   - **event_id**: 事件ID，唯一标识一个事件
   - **device_id**: 设备ID，事件发生的设备
-  - **event_time**: 事件发生时间
+  - **event_time**: 事件发生时间，ISO8601格式
   - **event_type**: 事件类型，1表示安全事件
   - **event_code**: 事件代码，例如"SEC_001"
   - **event_desc**: 事件描述
@@ -915,8 +914,8 @@
       - **user_id**: 用户ID
       - **status**: 用户状态（1:在线，2:离线，3:冻结，4:注销）
       - **online_duration**: 用户在线时长（秒）
-      - **behaviors**: 用户行为列表
-        - **time**: 行为发生时间
+      - **behaviors**: 用户行为列表（已标准化格式）
+        - **time**: 行为发生时间，ISO8601格式
         - **type**: 行为类型（1:发送，2:接收）
         - **data_type**: 数据类型（1:文件，2:消息）
         - **data_size**: 数据大小（字节）
@@ -926,10 +925,35 @@
 - **events**: 故障事件列表，包含系统故障和错误
   - **event_id**: 事件ID，唯一标识一个事件
   - **device_id**: 设备ID，事件发生的设备
-  - **event_time**: 事件发生时间
+  - **event_time**: 事件发生时间，ISO8601格式
   - **event_type**: 事件类型，2表示故障事件
   - **event_code**: 事件代码，例如"FAULT_001"
   - **event_desc**: 事件描述
+
+### 日志数据转换模型
+
+系统内部使用以下数据转换模型，确保日志输出格式的一致性和标准化：
+
+#### 1. LogContentLog
+
+整个日志文件的顶级结构，包含时间范围、安全事件、性能事件和故障事件。
+
+#### 2. SecurityDeviceLog
+
+安全设备的标准化日志格式，包含设备ID、性能指标和关联的网关设备列表。
+
+#### 3. GatewayDeviceLog
+
+网关设备的标准化日志格式，包含设备ID、性能指标和关联的用户列表。
+
+#### 4. UserInfoLog
+
+用户信息的标准化日志格式，包含用户ID、状态、在线时长和行为列表。
+
+#### 5. BehaviorLog
+
+用户行为的标准化日志格式，只包含必要的四个字段（time, type, data_type, data_size），
+移除了数据库相关字段，确保输出格式简洁明了。
 
 ### 日志管理模块工作流程
 
@@ -956,12 +980,12 @@
 
 ### 日志文件示例
 
-以下是一个完整的日志JSON文件示例（`20240515100000.json`）：
+以下是一个完整的标准化日志JSON文件示例（`20240515100000.json`）：
 
 ```json
 {
   "time_range": {
-    "start_time": "2024-05-15T10:00:00+08:00",
+    "start_time": "2024-05-15T10:00:00Z",
     "duration": 600
   },
   "security_events": {
@@ -969,20 +993,18 @@
       {
         "event_id": 1715735412000000001,
         "device_id": 1000,
-        "event_time": "2024-05-15T10:01:23+08:00",
+        "event_time": "2024-05-15T10:01:23Z",
         "event_type": 1,
         "event_code": "SEC_001",
-        "event_desc": "检测到异常登录尝试，IP: 192.168.1.120",
-        "created_at": "2024-05-15T10:01:23.521+08:00"
+        "event_desc": "检测到异常登录尝试，IP: 192.168.1.120"
       },
       {
         "event_id": 1715735497000000002,
         "device_id": 1001,
-        "event_time": "2024-05-15T10:02:48+08:00",
+        "event_time": "2024-05-15T10:02:48Z",
         "event_type": 1,
         "event_code": "SEC_003",
-        "event_desc": "用户权限变更，用户ID: 10005",
-        "created_at": "2024-05-15T10:02:48.109+08:00"
+        "event_desc": "用户权限变更，用户ID: 10005"
       }
     ]
   },
@@ -1008,13 +1030,13 @@
                 "online_duration": 7200,
                 "behaviors": [
                   {
-                    "time": "2024-05-15T10:03:15+08:00",
+                    "time": "2024-05-15T10:03:15Z",
                     "type": 1,
                     "data_type": 1,
                     "data_size": 2048576
                   },
                   {
-                    "time": "2024-05-15T10:07:42+08:00",
+                    "time": "2024-05-15T10:07:42Z",
                     "type": 2,
                     "data_type": 2,
                     "data_size": 4096
@@ -1027,7 +1049,7 @@
                 "online_duration": 3600,
                 "behaviors": [
                   {
-                    "time": "2024-05-15T10:05:22+08:00",
+                    "time": "2024-05-15T10:05:22Z",
                     "type": 2,
                     "data_type": 1,
                     "data_size": 1048576
@@ -1049,7 +1071,7 @@
                 "online_duration": 5400,
                 "behaviors": [
                   {
-                    "time": "2024-05-15T10:01:05+08:00",
+                    "time": "2024-05-15T10:01:05Z",
                     "type": 1,
                     "data_type": 2,
                     "data_size": 8192
@@ -1067,32 +1089,36 @@
       {
         "event_id": 1715735605000000003,
         "device_id": 2003,
-        "event_time": "2024-05-15T10:04:36+08:00",
+        "event_time": "2024-05-15T10:04:36Z",
         "event_type": 2,
         "event_code": "FAULT_002",
-        "event_desc": "设备内存使用率超过阈值(90%)",
-        "created_at": "2024-05-15T10:04:36.784+08:00"
+        "event_desc": "设备内存使用率超过阈值(90%)"
       },
       {
         "event_id": 1715735712000000004,
         "device_id": 2001,
-        "event_time": "2024-05-15T10:06:23+08:00",
+        "event_time": "2024-05-15T10:06:23Z",
         "event_type": 2,
         "event_code": "FAULT_005",
-        "event_desc": "网络连接不稳定，丢包率: 5%",
-        "created_at": "2024-05-15T10:06:23.421+08:00"
+        "event_desc": "网络连接不稳定，丢包率: 5%"
       }
     ]
   }
 }
 ```
 
-此示例展示了一个完整的日志文件结构，包含了10分钟（600秒）时间范围内的系统活动记录，包括：
+此示例展示了一个完整的标准化日志文件结构，包含了10分钟（600秒）时间范围内的系统活动记录，包括：
 - 2条安全事件记录（异常登录和权限变更）
 - 性能事件记录（1个安全接入管理设备连接2个网关设备，共3个用户的在线状态和行为）
 - 2条故障事件记录（内存使用率超标和网络连接不稳定）
 
-### 日志管理模块工作流程
+注意事项：
+- 所有时间字段均使用ISO8601标准的UTC格式
+- 用户行为数据仅包含4个标准化字段（time, type, data_type, data_size）
+- 事件记录移除了数据库特有字段（如created_at）
+- 字段命名采用一致的snake_case格式
+
+## 日志管理模块工作流程
 
 1. **定时生成**：
 
@@ -1479,3 +1505,29 @@ regist/certs/
    - 修改实现：在 `LogManager.uploadLog`方法中强制指定上传路径
    - 不再依赖配置文件中的 `UploadDir`设置，避免误配置
    - 便于自动化工具进行日志收集和分析
+
+### 日志格式标准化更新 (2025-03-28)
+
+为确保日志输出格式符合标准规范，系统完成了以下更新：
+
+1. **用户行为格式标准化**：
+   - 对日志中的用户行为字段进行规范化处理
+   - 简化字段结构，确保行为数据仅包含必要信息（time, type, data_type, data_size）
+   - 移除多余的数据库字段（如behavior_id, created_at, updated_at, deleted_at等）
+
+2. **数据转换层实现**：
+   - 添加专用的数据转换模型（LogContentLog, SecurityDeviceLog, GatewayDeviceLog, UserInfoLog, BehaviorLog）
+   - 实现一系列转换方法（ToLogContentLog, ToSecurityDeviceLog, ToGatewayDeviceLog, ToUserInfoLog, ToBehaviorLog）
+   - 在日志生成阶段自动将原始数据模型转换为标准输出格式
+
+3. **日志输出格式统一**：
+   - 确保所有日志字段命名一致（如"time"而非"behavior_time"）
+   - 确保日期时间格式统一使用ISO8601标准（RFC3339格式）
+   - 保持JSON结构清晰、层次分明，便于解析和分析
+
+4. **向后兼容性保障**：
+   - 保持原有API接口不变
+   - 内部数据模型结构不变，仅在输出阶段进行转换
+   - 确保已有的日志处理流程和工具不受影响
+
+这些更新确保了日志文件格式的一致性和标准化，提高了日志数据的可用性和可分析性，同时保持了与现有系统的兼容性。

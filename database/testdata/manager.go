@@ -58,8 +58,8 @@ func (m *TestDataManager) InitializeTestData() error {
 		return fmt.Errorf("生成用户数据失败: %w", err)
 	}
 
-	// 3. 基于用户生成行为数据
-	if err := m.behaviorGenerator.Generate(m.db, m.cfg.TestData.BehaviorsPerUser); err != nil {
+	// 3. 基于用户生成行为数据 (使用默认的skipIfExists=true)
+	if err := m.behaviorGenerator.Generate(m.db, m.cfg.TestData.BehaviorsPerUser, true); err != nil {
 		log.Printf("生成用户行为数据失败: %v", err)
 		return fmt.Errorf("生成用户行为数据失败: %w", err)
 	}
@@ -120,16 +120,24 @@ func (m *TestDataManager) realtimeDataGenerationLoop() {
 	defer ticker.Stop()
 
 	log.Printf("实时数据生成循环已启动，间隔: %v", interval)
+	log.Printf("数据生成时间范围: 当前时间 - %d分钟 至 当前时间 - %d分钟",
+		m.cfg.TestData.RealtimeStartTimeOffset,
+		m.cfg.TestData.RealtimeEndTimeOffset)
 
 	for {
 		select {
 		case <-ticker.C:
 			// 执行实时数据生成
+			log.Printf("触发实时数据生成，每个用户 %d 条记录...",
+				m.cfg.TestData.RealtimeBehaviorsPerInterval)
+
 			if err := m.behaviorGenerator.GenerateRealtime(
 				m.db,
 				m.cfg.TestData.RealtimeBehaviorsPerInterval,
 			); err != nil {
 				log.Printf("生成实时行为数据失败: %v", err)
+			} else {
+				log.Printf("实时数据生成完成")
 			}
 		case <-m.realtimeStopChan:
 			log.Println("收到停止信号，实时数据生成循环退出")

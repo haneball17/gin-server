@@ -242,6 +242,16 @@ type TestDataConfig struct {
 	// RealtimeBehaviorsPerInterval 每个间隔生成的行为数据量
 	// 默认10条，即每分钟为每个测试用户添加10条数据
 	RealtimeBehaviorsPerInterval int `json:"realtime_behaviors_per_interval" yaml:"realtime_behaviors_per_interval"`
+
+	// RealtimeStartTimeOffset 实时数据生成的起始时间偏移(分钟)
+	// 默认值为30，表示从当前时间往前30分钟作为起始时间
+	// 负值表示过去的时间，正值表示未来的时间（通常不建议使用正值）
+	RealtimeStartTimeOffset int `json:"realtime_start_time_offset" yaml:"realtime_start_time_offset"`
+
+	// RealtimeEndTimeOffset 实时数据生成的结束时间偏移(分钟)
+	// 默认值为0，表示直到当前时间
+	// 负值表示过去的时间，正值表示未来的时间（通常不建议使用正值）
+	RealtimeEndTimeOffset int `json:"realtime_end_time_offset" yaml:"realtime_end_time_offset"`
 }
 
 // EncryptionConfig 加密配置结构体
@@ -358,6 +368,8 @@ func InitConfig() {
 			BehaviorsPerUser:             getEnvInt("TEST_BEHAVIORS_PER_USER", 10),
 			RealtimeInterval:             getEnvInt("TEST_REALTIME_INTERVAL", 60),
 			RealtimeBehaviorsPerInterval: getEnvInt("TEST_REALTIME_BEHAVIORS_PER_INTERVAL", 10),
+			RealtimeStartTimeOffset:      getEnvInt("TEST_REALTIME_START_TIME_OFFSET", 2),
+			RealtimeEndTimeOffset:        getEnvInt("TEST_REALTIME_END_TIME_OFFSET", 0),
 		},
 	}
 
@@ -489,6 +501,8 @@ func DefaultConfig() *Config {
 			BehaviorsPerUser:             10,
 			RealtimeInterval:             60,
 			RealtimeBehaviorsPerInterval: 10,
+			RealtimeStartTimeOffset:      2,
+			RealtimeEndTimeOffset:        0,
 		},
 	}
 }

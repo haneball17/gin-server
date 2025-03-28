@@ -35,3 +35,46 @@ type UserInfo struct {
 	OnlineDuration int            `json:"online_duration"` // 在线时长
 	Behaviors      []UserBehavior `json:"behaviors"`       // 行为列表
 }
+
+// BehaviorLog 行为数据在日志中的格式（仅用于日志输出，不映射到数据库表）
+type BehaviorLog struct {
+	Time     string `json:"time"`      // ISO8601格式的时间
+	Type     int    `json:"type"`      // 行为类型，1:发送，2:接收
+	DataType int    `json:"data_type"` // 数据类型，1:文件，2:消息
+	DataSize int64  `json:"data_size"` // 数据大小（字节）
+}
+
+// UserInfoLog 用户信息在日志中的格式（仅用于日志输出，不映射到数据库表）
+type UserInfoLog struct {
+	UserID         int           `json:"user_id"`         // 用户id
+	Status         int           `json:"status"`          // 用户状态
+	OnlineDuration int           `json:"online_duration"` // 在线时长
+	Behaviors      []BehaviorLog `json:"behaviors"`       // 行为列表（使用简化的BehaviorLog格式）
+}
+
+// ToUserInfoLog 将UserInfo转换为UserInfoLog
+func (ui *UserInfo) ToUserInfoLog() UserInfoLog {
+	userInfoLog := UserInfoLog{
+		UserID:         ui.UserID,
+		Status:         ui.Status,
+		OnlineDuration: ui.OnlineDuration,
+		Behaviors:      make([]BehaviorLog, 0, len(ui.Behaviors)),
+	}
+
+	// 转换每个行为记录为简化格式
+	for _, behavior := range ui.Behaviors {
+		userInfoLog.Behaviors = append(userInfoLog.Behaviors, behavior.ToBehaviorLog())
+	}
+
+	return userInfoLog
+}
+
+// ToBehaviorLog 将UserBehavior转换为BehaviorLog
+func (ub *UserBehavior) ToBehaviorLog() BehaviorLog {
+	return BehaviorLog{
+		Time:     ub.BehaviorTime.Format(time.RFC3339),
+		Type:     ub.BehaviorType,
+		DataType: ub.DataType,
+		DataSize: ub.DataSize,
+	}
+}

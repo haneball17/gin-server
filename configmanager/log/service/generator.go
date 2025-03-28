@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"gin-server/configmanager/common/alert"
@@ -48,12 +49,31 @@ func NewGenerator(db *gorm.DB, alerter alert.Alerter) *Generator {
 // startTime: 日志的起始时间，通常为上次生成日志的时间
 // duration: 日志覆盖的时间范围（单位：秒）
 func (g *Generator) Generate(startTime time.Time, duration int64) (*models.LogContent, error) {
+	// 计算结束时间
 	endTime := startTime.Add(time.Duration(duration) * time.Second)
+
+	// 创建日志内容结构
 	logContent := &models.LogContent{}
 
 	// 设置时间范围
 	logContent.TimeRange.StartTime = startTime
 	logContent.TimeRange.Duration = duration
+
+	// 记录生成过程的日志
+	log.Printf("开始收集日志数据，时间范围: %v - %v (持续时间: %d秒)\n",
+		startTime.Format(time.RFC3339),
+		endTime.Format(time.RFC3339),
+		duration)
+
+	// 在时间差为0的情况下，生成空日志，但保留时间戳信息
+	if duration == 0 {
+		log.Printf("时间范围为0，生成空日志\n")
+		// 仅设置空集合，不执行查询
+		logContent.SecurityEvents.Events = []models.Event{}
+		logContent.FaultEvents.Events = []models.Event{}
+		logContent.PerformanceEvents.SecurityDevices = []models.SecurityDevice{}
+		return logContent, nil
+	}
 
 	// 获取安全事件
 	securityEvents, err := g.getSecurityEvents(startTime, endTime)
@@ -97,6 +117,12 @@ func (g *Generator) Generate(startTime time.Time, duration int64) (*models.LogCo
 	}
 	logContent.PerformanceEvents.SecurityDevices = securityDevices
 
+	// 记录日志数据量统计
+	log.Printf("收集完成 - 安全事件: %d, 故障事件: %d, 安全设备: %d\n",
+		len(securityEvents),
+		len(faultEvents),
+		len(securityDevices))
+
 	return logContent, nil
 }
 
@@ -111,8 +137,11 @@ func (g *Generator) GenerateToFile(startTime time.Time, duration int64, filePath
 		return err
 	}
 
+	// 转换为标准日志格式
+	logContentLog := logContent.ToLogContentLog()
+
 	// 转换为JSON
-	data, err := json.MarshalIndent(logContent, "", "  ")
+	data, err := json.MarshalIndent(logContentLog, "", "  ")
 	if err != nil {
 		g.alerter.Alert(&alert.Alert{
 			Level:   alert.AlertLevelError,
@@ -141,14 +170,46 @@ func (g *Generator) GenerateToFile(startTime time.Time, duration int64, filePath
 
 // getSecurityEvents 获取安全事件
 func (g *Generator) getSecurityEvents(startTime, endTime time.Time) ([]models.Event, error) {
-	events, _, err := g.eventRepository.FindByTypeAndTimeRange(models.EventTypeSecurity, startTime, endTime)
-	return events, err
+	events, count, err := g.eventRepository.FindByTypeAndTimeRange(models.EventTypeSecurity, startTime, endTime)
+	if err != nil {
+		return nil, fmt.Errorf("查询安全事件失败: %w", err)
+	}
+
+	// 日志记录查询结果
+	if count == 0 {
+		log.Printf("在时间范围 %v - %v 内未找到安全事件\n",
+			startTime.Format(time.RFC3339),
+			endTime.Format(time.RFC3339))
+	} else {
+		log.Printf("在时间范围 %v - %v 内找到 %d 条安全事件\n",
+			startTime.Format(time.RFC3339),
+			endTime.Format(time.RFC3339),
+			count)
+	}
+
+	return events, nil
 }
 
 // getFaultEvents 获取故障事件
 func (g *Generator) getFaultEvents(startTime, endTime time.Time) ([]models.Event, error) {
-	events, _, err := g.eventRepository.FindByTypeAndTimeRange(models.EventTypeFault, startTime, endTime)
-	return events, err
+	events, count, err := g.eventRepository.FindByTypeAndTimeRange(models.EventTypeFault, startTime, endTime)
+	if err != nil {
+		return nil, fmt.Errorf("查询故障事件失败: %w", err)
+	}
+
+	// 日志记录查询结果
+	if count == 0 {
+		log.Printf("在时间范围 %v - %v 内未找到故障事件\n",
+			startTime.Format(time.RFC3339),
+			endTime.Format(time.RFC3339))
+	} else {
+		log.Printf("在时间范围 %v - %v 内找到 %d 条故障事件\n",
+			startTime.Format(time.RFC3339),
+			endTime.Format(time.RFC3339),
+			count)
+	}
+
+	return events, nil
 }
 
 // getSecurityDevices 获取安全接入管理设备
@@ -263,8 +324,21 @@ func (g *Generator) getUsers(gatewayDeviceID int, startTime, endTime time.Time) 
 
 // getUserBehaviors 获取用户行为
 func (g *Generator) getUserBehaviors(userID int, startTime, endTime time.Time) ([]models.UserBehavior, error) {
-	behaviors, _, err := g.behaviorRepository.FindByUserIDAndTimeRange(userID, startTime, endTime)
-	return behaviors, err
+	behaviors, count, err := g.behaviorRepository.FindByUserIDAndTimeRange(userID, startTime, endTime)
+	if err != nil {
+		return nil, fmt.Errorf("查询用户行为失败: %w", err)
+	}
+
+	// 仅在调试模式下记录详细信息，避免日志过多
+	if count > 0 {
+		log.Printf("用户(ID: %d) 在时间范围 %v - %v 内找到 %d 条行为记录\n",
+			userID,
+			startTime.Format(time.RFC3339),
+			endTime.Format(time.RFC3339),
+			count)
+	}
+
+	return behaviors, nil
 }
 
 // retryOperation 重试操作

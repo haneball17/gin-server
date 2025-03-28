@@ -105,6 +105,13 @@ func main() {
 	config.InitConfig()
 	cfg := config.GetConfig()
 
+	// 启用实时测试数据生成
+	cfg.TestData.EnableRealtimeData = true
+	cfg.TestData.RealtimeInterval = 60            // 60秒间隔
+	cfg.TestData.RealtimeBehaviorsPerInterval = 2 // 每次每用户生成2条记录
+	cfg.TestData.RealtimeStartTimeOffset = 0      // 2分钟前
+	cfg.TestData.RealtimeEndTimeOffset = -2       // 当前时间
+
 	// 初始化密钥管理器 (非致命错误，允许继续)
 	if err := initKeyManager(cfg); err != nil {
 		stdlog.Printf("警告: 密钥管理器初始化失败，部分加密功能可能不可用")

@@ -479,7 +479,7 @@ func fixUserBehaviorsTable(db *gorm.DB) error {
 	cfg := config.GetConfig()
 
 	// 始终输出日志，不依赖于DebugLevel
-	log.Println("[数据库修复] 开始修复user_behaviors表结构...")
+	log.Println("[数据库修复] 开始检查user_behaviors表结构...")
 
 	// 检查user_behaviors表是否存在
 	var tableExists int
@@ -496,6 +496,34 @@ func fixUserBehaviorsTable(db *gorm.DB) error {
 	}
 
 	log.Println("[数据库修复] user_behaviors表存在，继续检查字段")
+
+	// 首先检查behavior_id列是否正确设置为自增主键
+	var behaviorIDInfo struct {
+		Field   string `gorm:"column:Field"`
+		Type    string `gorm:"column:Type"`
+		Null    string `gorm:"column:Null"`
+		Key     string `gorm:"column:Key"`
+		Default string `gorm:"column:Default"`
+		Extra   string `gorm:"column:Extra"`
+	}
+
+	err = db.Raw("SHOW COLUMNS FROM user_behaviors WHERE Field = 'behavior_id'").Scan(&behaviorIDInfo).Error
+	if err != nil {
+		log.Printf("[数据库修复] 错误：获取behavior_id列信息失败: %v", err)
+	} else {
+		log.Printf("[数据库修复] 检查behavior_id列: 类型=%s, 可空=%s, 键类型=%s, 默认值=%s, 额外=%s",
+			behaviorIDInfo.Type, behaviorIDInfo.Null, behaviorIDInfo.Key,
+			behaviorIDInfo.Default, behaviorIDInfo.Extra)
+
+		// 如果behavior_id已正确设置为自增主键，则不需要进一步修复
+		if behaviorIDInfo.Key == "PRI" && strings.Contains(behaviorIDInfo.Extra, "auto_increment") {
+			log.Println("[数据库修复] 验证成功: behavior_id已正确设置为自增主键，无需修复")
+			return nil
+		}
+	}
+
+	// 只有当表结构确实存在问题时，才执行备份和重建操作
+	log.Println("[数据库修复] 检测到behavior_id列配置不正确，需要修复...")
 
 	// 检查表结构
 	type TableInfo struct {
@@ -518,9 +546,8 @@ func fixUserBehaviorsTable(db *gorm.DB) error {
 			tableInfo.TableSchema, tableInfo.TableName, tableInfo.Engine, tableInfo.TableRows)
 	}
 
-	// 最彻底的方法：删除并重建表
-	// 这是一个激进的方法，仅在其他方法失败时考虑使用
-	log.Println("[数据库修复] 将尝试删除并重建user_behaviors表...")
+	// 备份并重建表，这是一个激进的方法，仅在结构确实有问题时使用
+	log.Println("[数据库修复] 将删除并重建user_behaviors表...")
 
 	// 1. 备份表内容（如果有必要）
 	if tableInfo.TableRows > 0 {
@@ -583,15 +610,6 @@ func fixUserBehaviorsTable(db *gorm.DB) error {
 	}
 
 	// 5. 特别检查behavior_id字段
-	var behaviorIDInfo struct {
-		Field   string `gorm:"column:Field"`
-		Type    string `gorm:"column:Type"`
-		Null    string `gorm:"column:Null"`
-		Key     string `gorm:"column:Key"`
-		Default string `gorm:"column:Default"`
-		Extra   string `gorm:"column:Extra"`
-	}
-
 	err = db.Raw("SHOW COLUMNS FROM user_behaviors WHERE Field = 'behavior_id'").Scan(&behaviorIDInfo).Error
 	if err != nil {
 		log.Printf("[数据库修复] 错误：验证时获取behavior_id列信息失败: %v", err)
