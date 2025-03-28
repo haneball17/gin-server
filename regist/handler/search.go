@@ -57,11 +57,14 @@ func GetUserByID(c *gin.Context) {
 		log.Printf("成功查询到用户ID为 %d 的信息\n", userID)
 	}
 
+	// 转换为响应结构体
+	userResponse := convertUserModelToResponse(user)
+
 	// 返回用户信息
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "用户查询成功",
-		"data":    user,
+		"data":    userResponse,
 	})
 }
 
@@ -109,10 +112,13 @@ func GetDeviceByID(c *gin.Context) {
 		log.Printf("成功查询到设备ID为 %d 的信息\n", deviceID)
 	}
 
+	// 转换为响应结构体
+	deviceResponse := convertDeviceModelToResponse(device)
+
 	// 返回设备信息
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "设备查询成功",
-		"data":    device,
+		"data":    deviceResponse,
 	})
 }

@@ -112,10 +112,16 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
+	// 转换为响应格式
+	userResponses := make([]UserResponse, 0, len(users))
+	for _, user := range users {
+		userResponses = append(userResponses, convertUserModelToResponse(&user))
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "获取用户列表成功",
-		"data":    users,
+		"data":    userResponses,
 	})
 }
 
@@ -175,10 +181,13 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
+	// 转换为响应结构体
+	userResponse := convertUserModelToResponse(existingUser)
+
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
 		"message": "用户信息更新成功",
-		"data":    existingUser,
+		"data":    userResponse,
 	})
 }
 

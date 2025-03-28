@@ -133,8 +133,8 @@ func (m *LogManager) GenerateLog() error {
 	// 将生成间隔转换为秒
 	durationSeconds := int64(intervalMinutes * 60)
 
-	// 构建日志文件名（格式：log_YYYYMMDD_HHmmss.json）
-	fileName := fmt.Sprintf("log_%s.json", startTime.Format("20060102_150405"))
+	// 构建日志文件名（格式：YYYYMMDDHHMMSS.json）
+	fileName := fmt.Sprintf("%s.json", startTime.Format("20060102150405"))
 
 	// 确保日志目录存在
 	logDir := m.config.ConfigManager.LogManager.LogDir
@@ -226,23 +226,17 @@ func (m *LogManager) DownloadLogFile(file service.File) ([]byte, error) {
 
 // uploadLog 上传指定的日志文件
 func (m *LogManager) uploadLog(logPath string) error {
-	uploadDir := strings.ReplaceAll(m.config.ConfigManager.LogManager.UploadDir, "\\", "/")
-	if !strings.HasSuffix(uploadDir, "/") {
-		uploadDir += "/"
-	}
+	// 确保上传目录为/log
+	uploadDir := "/log/"
 
-	// 读取日志文件
-	data, err := os.ReadFile(logPath)
-	if err != nil {
-		return fmt.Errorf("读取日志文件失败: %v", err)
-	}
+	// 设置新的上传目录到配置
+	m.config.ConfigManager.LogManager.UploadDir = uploadDir
 
-	// 获取文件名
-	fileName := filepath.Base(logPath)
-	remotePath := uploadDir + fileName
+	// 获取密钥文件路径
+	keyPath := m.config.ConfigManager.LogManager.ProcessedKeyPath
 
-	// 上传文件
-	err = m.uploader.UploadFile(remotePath, data)
+	// 使用Upload方法上传（会自动压缩打包）
+	err := m.uploader.Upload(logPath, keyPath)
 	if err != nil {
 		return fmt.Errorf("上传日志文件失败: %v", err)
 	}
@@ -250,6 +244,9 @@ func (m *LogManager) uploadLog(logPath string) error {
 	// 获取文件信息并创建或更新日志记录
 	fileInfo, err := os.Stat(logPath)
 	if err == nil {
+		// 获取文件名
+		fileName := filepath.Base(logPath)
+
 		// 创建日志文件记录
 		_, err = m.logService.CreateLogFile(fileName, fileInfo.Size(), logPath)
 		if err != nil {
@@ -260,6 +257,7 @@ func (m *LogManager) uploadLog(logPath string) error {
 		latestLog, err := m.logService.GetLatestLogFile()
 		if err == nil && latestLog != nil {
 			// 标记为已上传
+			remotePath := uploadDir + strings.TrimSuffix(fileName, filepath.Ext(fileName)) + ".tar.gz"
 			err = m.logService.MarkLogFileAsUploaded(latestLog.ID, remotePath)
 			if err != nil {
 				return fmt.Errorf("更新日志文件上传状态失败: %v", err)
