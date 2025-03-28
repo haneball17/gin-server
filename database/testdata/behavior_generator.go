@@ -75,6 +75,7 @@ func (g *BehaviorGenerator) Generate(db *gorm.DB, count int) error {
 			}
 
 			behavior := &models.UserBehavior{
+				BehaviorID:   0, // 设置为0，MySQL会自动处理自增字段
 				UserID:       user.UserID,
 				BehaviorTime: behaviorTime,
 				BehaviorType: behaviorType,
@@ -135,7 +136,9 @@ func (g *BehaviorGenerator) GenerateRealtime(db *gorm.DB, count int) error {
 				dataSize = g.RandomInt64(10, 1024) // 10B - 1KB
 			}
 
+			// 注意：behavior_id将由数据库自动生成，因为我们已在模型中设置了autoIncrement
 			behavior := &models.UserBehavior{
+				BehaviorID:   0, // 设置为0，MySQL会自动处理自增字段
 				UserID:       user.UserID,
 				BehaviorTime: behaviorTime,
 				BehaviorType: behaviorType,

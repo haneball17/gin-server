@@ -12,6 +12,9 @@ type LogService interface {
 	// CreateLogFile 创建日志文件记录
 	CreateLogFile(fileName string, fileSize int64, filePath string) (*models.LogFile, error)
 
+	// CreateLogFileWithTimeRange 创建带有指定时间范围的日志文件记录
+	CreateLogFileWithTimeRange(fileName string, fileSize int64, filePath string, startTime, endTime time.Time) (*models.LogFile, error)
+
 	// MarkLogFileAsUploaded 标记日志文件为已上传
 	MarkLogFileAsUploaded(id uint, remotePath string) error
 
@@ -57,6 +60,27 @@ func (s *logService) CreateLogFile(fileName string, fileSize int64, filePath str
 		FileSize:  fileSize,
 		StartTime: time.Now().Add(-24 * time.Hour), // 默认为24小时前的数据
 		EndTime:   time.Now(),
+	}
+
+	err := repo.Create(logFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return logFile, nil
+}
+
+// CreateLogFileWithTimeRange 创建带有指定时间范围的日志文件记录
+func (s *logService) CreateLogFileWithTimeRange(fileName string, fileSize int64, filePath string, startTime, endTime time.Time) (*models.LogFile, error) {
+	repo := s.repoFactory.GetLogFileRepository()
+
+	// 创建日志文件记录，使用指定的时间范围
+	logFile := &models.LogFile{
+		FileName:  fileName,
+		FilePath:  filePath,
+		FileSize:  fileSize,
+		StartTime: startTime,
+		EndTime:   endTime,
 	}
 
 	err := repo.Create(logFile)
@@ -115,6 +139,7 @@ func (s *logService) LogUserBehavior(userID int, behaviorType int, dataType int,
 
 	// 创建用户行为记录
 	behavior := &models.UserBehavior{
+		BehaviorID:   0, // 设置为0，MySQL会自动处理自增字段
 		UserID:       userID,
 		BehaviorTime: time.Now(),
 		BehaviorType: behaviorType,

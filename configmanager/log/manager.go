@@ -32,15 +32,16 @@ type Manager interface {
 
 // LogManager 日志管理器实现
 type LogManager struct {
-	config     *config.Config
-	db         *gorm.DB
-	generator  *service.Generator
-	encryptor  service.LogEncryptor
-	uploader   *service.UploadManager
-	alerter    alert.Alerter
-	logService LogService
-	stopChan   chan struct{}
-	isRunning  bool
+	config           *config.Config
+	db               *gorm.DB
+	generator        *service.Generator
+	encryptor        service.LogEncryptor
+	uploader         *service.UploadManager
+	alerter          alert.Alerter
+	logService       LogService
+	stopChan         chan struct{}
+	isRunning        bool
+	lastGenerateTime time.Time // 上次生成日志的时间，用于下次生成的起始时间
 }
 
 // NewLogManager 创建日志管理器
@@ -60,7 +61,8 @@ func NewLogManager(cfg *config.Config, db *gorm.DB) (*LogManager, error) {
 	// 创建日志服务
 	logService := NewLogService(repoFactory)
 
-	return &LogManager{
+	// 创建日志管理器实例
+	manager := &LogManager{
 		config:     cfg,
 		db:         db,
 		generator:  service.NewGenerator(db, alerter),
@@ -70,7 +72,27 @@ func NewLogManager(cfg *config.Config, db *gorm.DB) (*LogManager, error) {
 		logService: logService,
 		stopChan:   make(chan struct{}),
 		isRunning:  false,
-	}, nil
+	}
+
+	// 初始化 lastGenerateTime
+	// 尝试从数据库获取最新的日志文件记录
+	latestLogFile, err := logService.GetLatestLogFile()
+	if err == nil && latestLogFile != nil {
+		// 使用最新日志文件的结束时间作为上次生成时间
+		manager.lastGenerateTime = latestLogFile.EndTime
+		if cfg.DebugLevel == "true" {
+			log.Printf("从数据库加载上次日志生成时间: %v\n", manager.lastGenerateTime)
+		}
+	} else {
+		// 如果没有找到日志记录，使用当前时间减去配置的生成间隔
+		intervalMinutes := cfg.ConfigManager.LogManager.GenerateInterval
+		manager.lastGenerateTime = time.Now().Add(-time.Duration(intervalMinutes) * time.Minute)
+		if cfg.DebugLevel == "true" {
+			log.Printf("没有找到历史日志记录，使用默认的上次生成时间: %v\n", manager.lastGenerateTime)
+		}
+	}
+
+	return manager, nil
 }
 
 // Start 实现Manager接口
@@ -124,14 +146,24 @@ func (m *LogManager) GenerateLog() error {
 	// 获取当前时间作为生成的截止时间
 	now := time.Now()
 
-	// 获取配置的生成间隔（分钟）
-	intervalMinutes := m.config.ConfigManager.LogManager.GenerateInterval
+	// 使用上次生成时间作为起始时间
+	startTime := m.lastGenerateTime
 
-	// 计算开始时间（当前时间减去间隔时间）
-	startTime := now.Add(-time.Duration(intervalMinutes) * time.Minute)
+	// 如果上次生成时间为零值，或者不合理的值，则使用配置的方式计算
+	if startTime.IsZero() || startTime.After(now) {
+		// 获取配置的生成间隔（分钟）
+		intervalMinutes := m.config.ConfigManager.LogManager.GenerateInterval
+		// 计算开始时间（当前时间减去间隔时间）
+		startTime = now.Add(-time.Duration(intervalMinutes) * time.Minute)
+	}
 
-	// 将生成间隔转换为秒
-	durationSeconds := int64(intervalMinutes * 60)
+	// 如果起始时间和当前时间相同，增加一点时间避免产生空日志
+	if startTime.Equal(now) {
+		startTime = now.Add(-1 * time.Minute)
+	}
+
+	// 计算持续时间（秒）
+	durationSeconds := int64(now.Sub(startTime).Seconds())
 
 	// 构建日志文件名（格式：YYYYMMDDHHMMSS.json）
 	fileName := fmt.Sprintf("%s.json", startTime.Format("20060102150405"))
@@ -170,6 +202,16 @@ func (m *LogManager) GenerateLog() error {
 	// 上传日志文件
 	if err := m.uploadLog(processedLogPath); err != nil {
 		return fmt.Errorf("上传日志文件失败: %v", err)
+	}
+
+	// 更新上次生成时间为当前时间
+	m.lastGenerateTime = now
+
+	if m.config.DebugLevel == "true" {
+		log.Printf("日志生成完成，时间范围: %v - %v，更新上次生成时间为: %v\n",
+			startTime.Format(time.RFC3339),
+			now.Format(time.RFC3339),
+			m.lastGenerateTime.Format(time.RFC3339))
 	}
 
 	return nil
@@ -247,21 +289,33 @@ func (m *LogManager) uploadLog(logPath string) error {
 		// 获取文件名
 		fileName := filepath.Base(logPath)
 
-		// 创建日志文件记录
-		_, err = m.logService.CreateLogFile(fileName, fileInfo.Size(), logPath)
+		// 计算日志的时间范围
+		// 基于文件名提取起始时间（文件名格式为：YYYYMMDDHHMMSS.json）
+		startTimeStr := strings.TrimSuffix(fileName, ".json")
+		startTime, parseErr := time.ParseInLocation("20060102150405", startTimeStr, time.Local)
+
+		// 默认的时间范围
+		logStartTime := startTime
+		logEndTime := time.Now()
+
+		// 如果解析成功，使用从文件名解析出的时间作为起始时间
+		if parseErr == nil {
+			logStartTime = startTime
+		} else if m.config.DebugLevel == "true" {
+			log.Printf("无法从文件名解析时间: %v, 使用当前时间", parseErr)
+		}
+
+		// 创建日志文件记录，使用准确的时间范围
+		logFile, err := m.logService.CreateLogFileWithTimeRange(fileName, fileInfo.Size(), logPath, logStartTime, logEndTime)
 		if err != nil {
 			return fmt.Errorf("创建日志文件记录失败: %v", err)
 		}
 
-		// 查找最新的日志文件记录
-		latestLog, err := m.logService.GetLatestLogFile()
-		if err == nil && latestLog != nil {
-			// 标记为已上传
-			remotePath := uploadDir + strings.TrimSuffix(fileName, filepath.Ext(fileName)) + ".tar.gz"
-			err = m.logService.MarkLogFileAsUploaded(latestLog.ID, remotePath)
-			if err != nil {
-				return fmt.Errorf("更新日志文件上传状态失败: %v", err)
-			}
+		// 标记为已上传
+		remotePath := uploadDir + strings.TrimSuffix(fileName, filepath.Ext(fileName)) + ".tar.gz"
+		err = m.logService.MarkLogFileAsUploaded(logFile.ID, remotePath)
+		if err != nil {
+			return fmt.Errorf("更新日志文件上传状态失败: %v", err)
 		}
 	}
 

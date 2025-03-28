@@ -45,6 +45,8 @@ func NewGenerator(db *gorm.DB, alerter alert.Alerter) *Generator {
 }
 
 // Generate 生成日志
+// startTime: 日志的起始时间，通常为上次生成日志的时间
+// duration: 日志覆盖的时间范围（单位：秒）
 func (g *Generator) Generate(startTime time.Time, duration int64) (*models.LogContent, error) {
 	endTime := startTime.Add(time.Duration(duration) * time.Second)
 	logContent := &models.LogContent{}
@@ -99,6 +101,9 @@ func (g *Generator) Generate(startTime time.Time, duration int64) (*models.LogCo
 }
 
 // GenerateToFile 生成日志并写入文件
+// startTime: 日志的起始时间，通常为上次生成日志的时间
+// duration: 日志覆盖的时间范围（单位：秒）
+// filePath: 保存日志文件的路径
 func (g *Generator) GenerateToFile(startTime time.Time, duration int64, filePath string) error {
 	// 生成日志
 	logContent, err := g.Generate(startTime, duration)

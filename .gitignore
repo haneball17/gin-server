@@ -16,3 +16,5 @@ regist/certs/keys/*
 ## 忽略/regist/certs/certs目录下的所有文件
 regist/certs/certs/*
 
+## 忽略 日志管理模块说明.md
+日志管理模块说明.md

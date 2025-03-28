@@ -104,9 +104,9 @@ func (t *GiteeTransporter) Upload(localPath, remotePath string) error {
 		return NewTransferError("upload", remotePath, fmt.Errorf("编码请求数据失败: %w", err))
 	}
 
-	if cfg.DebugLevel == "true" {
-		log.Printf("请求数据: %s\n", string(jsonData))
-	}
+	// if cfg.DebugLevel == "true" {
+	// 	log.Printf("请求数据: %s\n", string(jsonData))
+	// }
 
 	// 构造API URL
 	url := fmt.Sprintf("%s/repos/%s/%s/contents/%s", giteeAPIBase, t.owner, t.repo, remotePath)
@@ -140,7 +140,7 @@ func (t *GiteeTransporter) Upload(localPath, remotePath string) error {
 
 	if cfg.DebugLevel == "true" {
 		log.Printf("响应状态码: %d\n", resp.StatusCode)
-		log.Printf("响应内容: %s\n", string(respBody))
+		// log.Printf("响应内容: %s\n", string(respBody))
 	}
 
 	// 检查响应状态

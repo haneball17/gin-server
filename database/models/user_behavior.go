@@ -8,12 +8,19 @@ import (
 
 // UserBehavior 用户行为
 type UserBehavior struct {
-	gorm.Model
+	// 行为ID，设置为主键并自增
+	BehaviorID int `json:"behavior_id" gorm:"column:behavior_id;primaryKey;autoIncrement;not null"`
+	// 其他字段
 	UserID       int       `json:"user_id" gorm:"column:user_id;index;not null"`             // 用户ID
 	BehaviorTime time.Time `json:"behavior_time" gorm:"column:behavior_time;index;not null"` // 行为开始时间
 	BehaviorType int       `json:"behavior_type" gorm:"column:behavior_type;index;not null"` // 行为类型，1:发送，2:接收
 	DataType     int       `json:"data_type" gorm:"column:data_type;not null"`               // 数据类型，1:文件，2:消息
 	DataSize     int64     `json:"data_size" gorm:"column:data_size;not null"`               // 数据大小
+
+	// GORM的标准字段
+	CreatedAt time.Time      `json:"created_at"`              // 创建时间
+	UpdatedAt time.Time      `json:"updated_at"`              // 更新时间
+	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"` // 删除时间（软删除）
 }
 
 // TableName 指定表名

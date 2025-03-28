@@ -6,6 +6,7 @@ import (
 	"gin-server/database/models"
 	"log"
 	"strings"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -29,6 +30,11 @@ func AutoMigrate(db *gorm.DB) error {
 	// 在执行迁移前修复可能存在的数据问题
 	if err := fixDuplicateUserIDs(db); err != nil {
 		return fmt.Errorf("修复用户ID冲突失败: %w", err)
+	}
+
+	// 修复user_behaviors表结构
+	if err := fixUserBehaviorsTable(db); err != nil {
+		return fmt.Errorf("修复user_behaviors表结构失败: %w", err)
 	}
 
 	// 需要迁移的主数据库模型
@@ -383,7 +389,7 @@ func EnsureLogFilesTableExists(db *gorm.DB) error {
 	return db.Exec(createTableSQL).Error
 }
 
-// fixDuplicateUserIDs 修复用户表中重复的user_id值
+// fixDuplicateUserIDs 修复用户ID冲突问题
 func fixDuplicateUserIDs(db *gorm.DB) error {
 	cfg := config.GetConfig()
 
@@ -465,5 +471,142 @@ func fixDuplicateUserIDs(db *gorm.DB) error {
 		log.Println("成功修复用户表中的重复user_id值")
 	}
 
+	return nil
+}
+
+// fixUserBehaviorsTable 修复user_behaviors表的behavior_id字段问题
+func fixUserBehaviorsTable(db *gorm.DB) error {
+	cfg := config.GetConfig()
+
+	// 始终输出日志，不依赖于DebugLevel
+	log.Println("[数据库修复] 开始修复user_behaviors表结构...")
+
+	// 检查user_behaviors表是否存在
+	var tableExists int
+	err := db.Raw("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?",
+		cfg.DBName, "user_behaviors").Scan(&tableExists).Error
+	if err != nil {
+		log.Printf("[数据库修复] 错误：检查user_behaviors表是否存在失败: %v", err)
+		return fmt.Errorf("检查user_behaviors表是否存在时出错: %w", err)
+	}
+
+	if tableExists == 0 {
+		log.Println("[数据库修复] user_behaviors表不存在，将通过AutoMigrate创建")
+		return nil
+	}
+
+	log.Println("[数据库修复] user_behaviors表存在，继续检查字段")
+
+	// 检查表结构
+	type TableInfo struct {
+		TableSchema string `gorm:"column:TABLE_SCHEMA"`
+		TableName   string `gorm:"column:TABLE_NAME"`
+		Engine      string `gorm:"column:ENGINE"`
+		TableRows   int    `gorm:"column:TABLE_ROWS"`
+	}
+
+	var tableInfo TableInfo
+	err = db.Raw(`SELECT TABLE_SCHEMA, TABLE_NAME, ENGINE, TABLE_ROWS 
+		FROM information_schema.tables 
+		WHERE table_schema = ? AND table_name = ?`,
+		cfg.DBName, "user_behaviors").Scan(&tableInfo).Error
+
+	if err != nil {
+		log.Printf("[数据库修复] 错误：获取user_behaviors表信息失败: %v", err)
+	} else {
+		log.Printf("[数据库修复] 表信息: 数据库=%s, 表名=%s, 引擎=%s, 行数=%d",
+			tableInfo.TableSchema, tableInfo.TableName, tableInfo.Engine, tableInfo.TableRows)
+	}
+
+	// 最彻底的方法：删除并重建表
+	// 这是一个激进的方法，仅在其他方法失败时考虑使用
+	log.Println("[数据库修复] 将尝试删除并重建user_behaviors表...")
+
+	// 1. 备份表内容（如果有必要）
+	if tableInfo.TableRows > 0 {
+		log.Printf("[数据库修复] 表中有 %d 行数据，将先备份", tableInfo.TableRows)
+
+		// 创建备份表
+		backupTableName := "user_behaviors_backup_" + time.Now().Format("20060102150405")
+		createBackupSQL := fmt.Sprintf("CREATE TABLE %s LIKE user_behaviors", backupTableName)
+
+		err = db.Exec(createBackupSQL).Error
+		if err != nil {
+			log.Printf("[数据库修复] 警告：创建备份表失败: %v", err)
+		} else {
+			// 复制数据
+			copyDataSQL := fmt.Sprintf("INSERT INTO %s SELECT * FROM user_behaviors", backupTableName)
+			err = db.Exec(copyDataSQL).Error
+			if err != nil {
+				log.Printf("[数据库修复] 警告：复制数据到备份表失败: %v", err)
+			} else {
+				log.Printf("[数据库修复] 成功创建备份表 %s", backupTableName)
+			}
+		}
+	}
+
+	// 2. 删除现有表
+	dropTableSQL := "DROP TABLE IF EXISTS user_behaviors"
+	err = db.Exec(dropTableSQL).Error
+	if err != nil {
+		log.Printf("[数据库修复] 错误：删除user_behaviors表失败: %v", err)
+		return fmt.Errorf("删除user_behaviors表失败: %w", err)
+	}
+	log.Println("[数据库修复] 成功删除user_behaviors表")
+
+	// 3. 通过GORM的AutoMigrate重新创建表
+	err = db.AutoMigrate(&models.UserBehavior{})
+	if err != nil {
+		log.Printf("[数据库修复] 错误：通过AutoMigrate重建user_behaviors表失败: %v", err)
+		return fmt.Errorf("重建user_behaviors表失败: %w", err)
+	}
+	log.Println("[数据库修复] 成功通过AutoMigrate重建user_behaviors表")
+
+	// 4. 验证表结构
+	var newColumns []struct {
+		Field   string `gorm:"column:Field"`
+		Type    string `gorm:"column:Type"`
+		Null    string `gorm:"column:Null"`
+		Key     string `gorm:"column:Key"`
+		Default string `gorm:"column:Default"`
+		Extra   string `gorm:"column:Extra"`
+	}
+
+	if err := db.Raw("SHOW COLUMNS FROM user_behaviors").Scan(&newColumns).Error; err != nil {
+		log.Printf("[数据库修复] 错误：验证时获取表列信息失败: %v", err)
+	} else {
+		log.Println("[数据库修复] 重建后的表列信息:")
+		for _, col := range newColumns {
+			log.Printf("[数据库修复] 列名=%s, 类型=%s, 可空=%s, 键类型=%s, 默认值=%s, 额外=%s",
+				col.Field, col.Type, col.Null, col.Key, col.Default, col.Extra)
+		}
+	}
+
+	// 5. 特别检查behavior_id字段
+	var behaviorIDInfo struct {
+		Field   string `gorm:"column:Field"`
+		Type    string `gorm:"column:Type"`
+		Null    string `gorm:"column:Null"`
+		Key     string `gorm:"column:Key"`
+		Default string `gorm:"column:Default"`
+		Extra   string `gorm:"column:Extra"`
+	}
+
+	err = db.Raw("SHOW COLUMNS FROM user_behaviors WHERE Field = 'behavior_id'").Scan(&behaviorIDInfo).Error
+	if err != nil {
+		log.Printf("[数据库修复] 错误：验证时获取behavior_id列信息失败: %v", err)
+	} else {
+		log.Printf("[数据库修复] 验证behavior_id列: 类型=%s, 可空=%s, 键类型=%s, 默认值=%s, 额外=%s",
+			behaviorIDInfo.Type, behaviorIDInfo.Null, behaviorIDInfo.Key,
+			behaviorIDInfo.Default, behaviorIDInfo.Extra)
+
+		if behaviorIDInfo.Key == "PRI" && strings.Contains(behaviorIDInfo.Extra, "auto_increment") {
+			log.Println("[数据库修复] 验证成功: behavior_id已正确设置为自增主键")
+		} else {
+			log.Println("[数据库修复] 警告：验证失败，behavior_id列设置可能不正确")
+		}
+	}
+
+	log.Println("[数据库修复] user_behaviors表结构修复完成")
 	return nil
 }
