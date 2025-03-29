@@ -48,7 +48,7 @@ func (r *userRepository) WithTx(tx *gorm.DB) Repository {
 	}
 }
 
-// FindByID 根据ID查找用户
+// FindByID 根据user_id查找用户
 func (r *userRepository) FindByID(id uint) (*models.User, error) {
 	var user models.User
 	if err := r.GetDB().First(&user, id).Error; err != nil {

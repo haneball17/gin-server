@@ -367,9 +367,9 @@ func InitConfig() {
 			UsersPerDevice:               getEnvInt("TEST_USERS_PER_DEVICE", 5),
 			BehaviorsPerUser:             getEnvInt("TEST_BEHAVIORS_PER_USER", 10),
 			RealtimeInterval:             getEnvInt("TEST_REALTIME_INTERVAL", 60),
-			RealtimeBehaviorsPerInterval: getEnvInt("TEST_REALTIME_BEHAVIORS_PER_INTERVAL", 10),
-			RealtimeStartTimeOffset:      getEnvInt("TEST_REALTIME_START_TIME_OFFSET", 2),
-			RealtimeEndTimeOffset:        getEnvInt("TEST_REALTIME_END_TIME_OFFSET", 0),
+			RealtimeBehaviorsPerInterval: getEnvInt("TEST_REALTIME_BEHAVIORS_PER_INTERVAL", 2),
+			RealtimeStartTimeOffset:      getEnvInt("TEST_REALTIME_START_TIME_OFFSET", 0),
+			RealtimeEndTimeOffset:        getEnvInt("TEST_REALTIME_END_TIME_OFFSET", -2),
 		},
 	}
 

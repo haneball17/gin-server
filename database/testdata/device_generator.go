@@ -47,6 +47,10 @@ func (g *DeviceGenerator) Generate(db *gorm.DB, count int) error {
 		DeviceStatus:     1,    // 1表示在线
 		RegisterIP:       g.RandomIP(),
 		Email:            g.RandomEmail(),
+		// 安全接入管理设备这三个字段为空
+		LongAddress:  "",
+		ShortAddress: "",
+		SESKey:       "",
 	}
 
 	if err := db.Create(rootDevice).Error; err != nil {
@@ -58,6 +62,16 @@ func (g *DeviceGenerator) Generate(db *gorm.DB, count int) error {
 		deviceID := 1001 + i            // 从1001开始，避免与根设备ID冲突
 		deviceType := g.RandomInt(1, 3) // 随机网关设备类型1-3
 		deviceName := fmt.Sprintf("网关设备-%d-%d", deviceType, i+1)
+
+		// 生成IPv6格式的长地址
+		longAddress := g.RandomIPv6()
+
+		// 生成2字节的短地址（以十六进制格式表示）
+		shortAddress := fmt.Sprintf("%02X%02X",
+			g.RandomInt(0, 255), g.RandomInt(0, 255))
+
+		// 生成SES密钥
+		sesKey := g.RandomString(16)
 
 		device := &models.Device{
 			DeviceName:          deviceName,
@@ -72,6 +86,10 @@ func (g *DeviceGenerator) Generate(db *gorm.DB, count int) error {
 			RegisterIP:          g.RandomIP(),
 			Email:               g.RandomEmail(),
 			HardwareFingerprint: g.RandomString(32),
+			// 设置网关设备的三个新字段
+			LongAddress:  longAddress,
+			ShortAddress: shortAddress,
+			SESKey:       sesKey,
 		}
 
 		if err := db.Create(device).Error; err != nil {

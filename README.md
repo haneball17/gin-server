@@ -220,7 +220,10 @@
     "device_type": int,               // 设备类型，必填，1-4分别代表不同类型设备
     "pass_wd": "string",              // 设备登录口令，必填，最少8字符
     "device_id": int,                 // 设备唯一标识，必填
-    "superior_device_id": int         // 上级设备ID，必填（安全接入管理设备为0）
+    "superior_device_id": int,        // 上级设备ID，必填（安全接入管理设备为0）
+    "long_address": "string",         // 网关设备通讯时使用的长地址，格式为IPv6地址，安全接入管理设备注册时为空
+    "short_address": "string",        // 网关设备通讯时使用的短地址，格式为2字节的网络标识，安全接入管理设备注册时为空
+    "ses_key": "string"               // 网关的SES密钥，用于加密通信内容，安全接入管理设备注册时为空
   }
   ```
 - **响应格式**: JSON
@@ -248,7 +251,10 @@
       "register_ip": "127.0.0.1",
       "email": "",
       "hardware_fingerprint": "",
-      "anonymous_user": ""
+      "anonymous_user": "",
+      "long_address": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+      "short_address": "AB12",
+      "ses_key": "a1b2c3d4e5f6g7h8"
     }
   }
   ```
@@ -290,7 +296,34 @@
         "register_ip": "220.42.76.214",
         "email": "VCSNayol@company.net",
         "hardware_fingerprint": "",
-        "anonymous_user": ""
+        "anonymous_user": "",
+        "long_address": "",
+        "short_address": "",
+        "ses_key": ""
+      },
+      {
+        "ID": 2,
+        "CreatedAt": "2025-03-22T23:26:54.327+08:00",
+        "UpdatedAt": "2025-03-22T23:26:54.327+08:00",
+        "DeletedAt": null,
+        "device_name": "网关设备01",
+        "device_type": 1,
+        "password": "gateway123",
+        "device_id": 2001,
+        "superior_device_id": 1000,
+        "device_status": 1,
+        "peak_cpu_usage": 15,
+        "peak_memory_usage": 25,
+        "online_duration": 3600,
+        "cert_id": "",
+        "key_id": "",
+        "register_ip": "192.168.1.100",
+        "email": "gateway@company.net",
+        "hardware_fingerprint": "",
+        "anonymous_user": "",
+        "long_address": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+        "short_address": "AB12",
+        "ses_key": "a1b2c3d4e5f6g7h8"
       }
     ]
   }
@@ -318,6 +351,9 @@
 | email                | STRING   | 联系邮箱                                                                    |
 | hardware_fingerprint | STRING   | 设备硬件指纹                                                                |
 | anonymous_user       | STRING   | 匿名用户                                                                    |
+| long_address         | STRING   | 网关设备通讯时使用的长地址，格式为IPv6地址                                  |
+| short_address        | STRING   | 网关设备通讯时使用的短地址，格式为2字节的网络标识                           |
+| ses_key              | STRING   | 网关的SES密钥，用于加密通信内容                                             |
 
 #### 3. 指定设备查找
 
@@ -335,7 +371,7 @@
     "message": "设备查询成功",
     "data": {
       "ID": 1,
-      "DeviceName": "设备1",
+      "DeviceName": "网关设备01",
       "DeviceType": 1,
       "DeviceID": 1001,
       "SuperiorDeviceID": 0,
@@ -344,6 +380,9 @@
       "KeyID": "key_id_1",
       "RegisterIP": "192.168.1.100",
       "Email": "device1@example.com",
+      "LongAddress": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+      "ShortAddress": "AB12",
+      "SESKey": "a1b2c3d4e5f6g7h8",
       "CreatedAt": "2024-03-05T15:00:00Z"
     }
   }
@@ -1368,15 +1407,18 @@ regist/certs/
 | deviceName          | VARCHAR(50)  | 设备名称                                                                  |
 | deviceType          | INT          | 设备类型，1:网关设备A型，2:网关设备B型，3:网关设备C型，4:安全接入管理设备 |
 | password            | VARCHAR(255) | 设备登录口令                                                              |
-| deviceID            | INT          | 设备唯一标识                                                              |
+| deviceID            | INT          | 设备唯一标识                                                                |
 | superiorDeviceID    | INT          | 上级设备ID                                                                |
 | deviceStatus        | INT          | 设备状态，1:在线，2:离线，3:冻结，4:注销                                  |
 | certID              | VARCHAR(64)  | 证书ID                                                                    |
 | keyID               | VARCHAR(64)  | 密钥ID                                                                    |
 | registerIP          | VARCHAR(24)  | 注册IP                                                                    |
-| email               | VARCHAR(32)  | 联系邮箱                                                                  |
-| hardwareFingerprint | VARCHAR(128) | 设备硬件指纹                                                              |
-| anonymousUser       | VARCHAR(50)  | 匿名用户                                                                  |
+| email               | VARCHAR(32)  | 联系邮箱                                                                    |
+| hardwareFingerprint | VARCHAR(128) | 设备硬件指纹                                                                |
+| anonymousUser       | VARCHAR(50)  | 匿名用户                                                                    |
+| longAddress         | VARCHAR(255) | 网关设备通讯时使用的长地址，格式为IPv6地址                                |
+| shortAddress        | VARCHAR(255) | 网关设备通讯时使用的短地址，格式为2字节的网络标识                         |
+| sesKey              | VARCHAR(255) | 网关的SES密钥，用于加密通信内容                                           |
 
 #### 1.2 用户表 (users)
 

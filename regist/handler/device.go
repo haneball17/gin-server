@@ -28,6 +28,9 @@ type Device struct {
 	Email               string  `json:"email"`                                       // 邮箱，注册时需要
 	HardwareFingerprint *string `json:"hardware_fingerprint"`                        // 设备硬件指纹，允许为 NULL
 	AnonymousUser       *string `json:"anonymous_user"`                              // 匿名用户，允许为 NULL
+	LongAddress         string  `json:"long_address"`                                // 网关设备通讯时使用的长地址，格式为IPv6地址，安全接入管理设备注册时为空
+	ShortAddress        string  `json:"short_address"`                               // 网关设备通讯时使用的短地址，格式为2字节的网络标识，安全接入管理设备注册时为空
+	SESKey              string  `json:"ses_key"`                                     // 网关的SES密钥，用于加密通信内容，安全接入管理设备注册时为空
 }
 
 // DeviceRegisterRequest 简化的设备注册请求结构体
@@ -37,6 +40,9 @@ type DeviceRegisterRequest struct {
 	PassWD           string `json:"pass_wd" binding:"required,min=8"`            // 设备登录口令，注册时需要
 	DeviceID         int    `json:"device_id" binding:"required"`                // 设备唯一标识，注册时需要
 	SuperiorDeviceID int    `json:"superior_device_id" `                         // 上级设备ID，注册时需要，当设备为安全接入管理设备时，上级设备ID为0
+	LongAddress      string `json:"long_address"`                                // 网关设备通讯时使用的长地址，安全接入管理设备注册时为空
+	ShortAddress     string `json:"short_address"`                               // 网关设备通讯时使用的短地址，安全接入管理设备注册时为空
+	SESKey           string `json:"ses_key"`                                     // 网关的SES密钥，安全接入管理设备注册时为空
 }
 
 // RegisterDevice 处理设备注册请求
@@ -76,6 +82,22 @@ func RegisterDevice(c *gin.Context) {
 		return
 	}
 
+	// 如果设备类型为网关设备(1,2,3)，验证长地址、短地址和SES密钥是否已提供
+	if request.DeviceType >= 1 && request.DeviceType <= 3 {
+		if request.LongAddress == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供长地址"})
+			return
+		}
+		if request.ShortAddress == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供短地址"})
+			return
+		}
+		if request.SESKey == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供SES密钥"})
+			return
+		}
+	}
+
 	// 创建新设备模型
 	newDevice := &models.Device{
 		DeviceName:       request.DeviceName,
@@ -88,6 +110,9 @@ func RegisterDevice(c *gin.Context) {
 		KeyID:            "",
 		RegisterIP:       c.ClientIP(), // 自动获取客户端IP
 		Email:            "",
+		LongAddress:      request.LongAddress,
+		ShortAddress:     request.ShortAddress,
+		SESKey:           request.SESKey,
 	}
 
 	// 创建设备
@@ -174,6 +199,22 @@ func UpdateDevice(c *gin.Context) {
 		return
 	}
 
+	// 如果设备类型为网关设备(1,2,3)，验证长地址、短地址和SES密钥是否已提供
+	if device.DeviceType >= 1 && device.DeviceType <= 3 {
+		if device.LongAddress == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供长地址"})
+			return
+		}
+		if device.ShortAddress == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供短地址"})
+			return
+		}
+		if device.SESKey == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "网关设备必须提供SES密钥"})
+			return
+		}
+	}
+
 	// 更新设备字段
 	existingDevice.DeviceName = device.DeviceName
 	existingDevice.DeviceType = device.DeviceType
@@ -184,6 +225,9 @@ func UpdateDevice(c *gin.Context) {
 	existingDevice.KeyID = device.KeyID
 	existingDevice.RegisterIP = device.RegisterIP
 	existingDevice.Email = device.Email
+	existingDevice.LongAddress = device.LongAddress
+	existingDevice.ShortAddress = device.ShortAddress
+	existingDevice.SESKey = device.SESKey
 
 	// 处理可能为nil的指针字段
 	if device.HardwareFingerprint != nil {

@@ -43,8 +43,8 @@ func GetUserByID(c *gin.Context) {
 	repoFactory := repositories.NewRepositoryFactory(db)
 	userRepo := repoFactory.GetUserRepository()
 
-	// 查询用户信息
-	user, err := userRepo.FindByID(uint(userID))
+	// 查询用户信息 - 改为使用用户唯一标识(user_id)查询，而不是数据库主键(ID)
+	user, err := userRepo.FindByUserID(userID)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
 			log.Printf("查询用户失败: %v\n", err)
@@ -54,7 +54,7 @@ func GetUserByID(c *gin.Context) {
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Printf("成功查询到用户ID为 %d 的信息\n", userID)
+		log.Printf("成功查询到用户标识为 %d 的信息\n", userID)
 	}
 
 	// 转换为响应结构体
@@ -98,7 +98,7 @@ func GetDeviceByID(c *gin.Context) {
 	repoFactory := repositories.NewRepositoryFactory(db)
 	deviceRepo := repoFactory.GetDeviceRepository()
 
-	// 查询设备信息
+	// 查询设备信息 - 这里已经使用设备唯一标识(device_id)查询，而不是数据库主键(ID)
 	device, err := deviceRepo.FindByDeviceID(deviceID)
 	if err != nil {
 		if cfg.DebugLevel == "true" {
@@ -109,7 +109,7 @@ func GetDeviceByID(c *gin.Context) {
 	}
 
 	if cfg.DebugLevel == "true" {
-		log.Printf("成功查询到设备ID为 %d 的信息\n", deviceID)
+		log.Printf("成功查询到设备标识为 %d 的信息\n", deviceID)
 	}
 
 	// 转换为响应结构体

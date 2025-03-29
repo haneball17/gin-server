@@ -22,6 +22,9 @@ type Device struct {
 	Email               string `json:"email" gorm:"column:email;type:varchar(128)"`
 	HardwareFingerprint string `json:"hardware_fingerprint" gorm:"column:hardware_fingerprint;type:varchar(255)"`
 	AnonymousUser       string `json:"anonymous_user" gorm:"column:anonymous_user;type:varchar(128)"`
+	LongAddress         string `json:"long_address" gorm:"column:long_address;type:varchar(255)"`
+	ShortAddress        string `json:"short_address" gorm:"column:short_address;type:varchar(255)"`
+	SESKey              string `json:"ses_key" gorm:"column:ses_key;type:varchar(255)"`
 }
 
 // TableName 指定表名

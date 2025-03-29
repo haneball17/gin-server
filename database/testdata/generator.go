@@ -5,6 +5,7 @@ import (
 	"gin-server/config"
 	"log"
 	"math/rand"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -76,6 +77,18 @@ func (g *BaseGenerator) RandomInt64(min, max int64) int64 {
 // RandomBool 生成随机布尔值
 func (g *BaseGenerator) RandomBool() bool {
 	return g.random.Intn(2) == 1
+}
+
+// RandomIPv6 生成随机的IPv6地址
+func (g *BaseGenerator) RandomIPv6() string {
+	// 生成8组4位十六进制数
+	segments := make([]string, 8)
+	for i := 0; i < 8; i++ {
+		segments[i] = fmt.Sprintf("%04x", g.random.Intn(65536))
+	}
+
+	// 按照IPv6格式连接
+	return strings.Join(segments, ":")
 }
 
 // LogInfo 记录信息日志

@@ -89,6 +89,9 @@ type DeviceResponse struct {
 	Email               string `json:"email"`
 	HardwareFingerprint string `json:"hardware_fingerprint,omitempty"`
 	AnonymousUser       string `json:"anonymous_user,omitempty"`
+	LongAddress         string `json:"long_address,omitempty"`
+	ShortAddress        string `json:"short_address,omitempty"`
+	SESKey              string `json:"ses_key,omitempty"`
 	CreatedAt           string `json:"created_at"`
 	UpdatedAt           string `json:"updated_at,omitempty"`
 }
@@ -111,6 +114,9 @@ func convertDeviceModelToResponse(device *models.Device) DeviceResponse {
 		Email:               device.Email,
 		HardwareFingerprint: device.HardwareFingerprint,
 		AnonymousUser:       device.AnonymousUser,
+		LongAddress:         device.LongAddress,
+		ShortAddress:        device.ShortAddress,
+		SESKey:              device.SESKey,
 		CreatedAt:           device.CreatedAt.Format("2006-01-02T15:04:05Z"),
 	}
 

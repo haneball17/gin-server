@@ -37,6 +37,11 @@ func AutoMigrate(db *gorm.DB) error {
 		return fmt.Errorf("修复user_behaviors表结构失败: %w", err)
 	}
 
+	// 修复devices表结构，确保新字段存在
+	if err := fixDevicesTable(db); err != nil {
+		return fmt.Errorf("修复devices表结构失败: %w", err)
+	}
+
 	// 需要迁移的主数据库模型
 	migrationModels := []interface{}{
 		&models.User{},
@@ -626,5 +631,76 @@ func fixUserBehaviorsTable(db *gorm.DB) error {
 	}
 
 	log.Println("[数据库修复] user_behaviors表结构修复完成")
+	return nil
+}
+
+// fixDevicesTable 确保devices表中存在新增字段
+func fixDevicesTable(db *gorm.DB) error {
+	cfg := config.GetConfig()
+	if cfg.DebugLevel == "true" {
+		log.Println("检查设备表结构，确保新字段存在...")
+	}
+
+	// 检查表是否存在
+	var tableExists int
+	row := db.Raw("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?",
+		cfg.DBName, "devices").Row()
+	row.Scan(&tableExists)
+
+	if tableExists == 0 {
+		if cfg.DebugLevel == "true" {
+			log.Println("设备表不存在，将由自动迁移创建")
+		}
+		return nil
+	}
+
+	// 检查long_address字段是否存在
+	var longAddressExists int
+	row = db.Raw("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = ? AND table_name = ? AND column_name = ?",
+		cfg.DBName, "devices", "long_address").Row()
+	row.Scan(&longAddressExists)
+
+	// 如果long_address字段不存在，添加它
+	if longAddressExists == 0 {
+		if err := db.Exec("ALTER TABLE devices ADD COLUMN long_address VARCHAR(255)").Error; err != nil {
+			return fmt.Errorf("添加long_address字段失败: %w", err)
+		}
+		if cfg.DebugLevel == "true" {
+			log.Println("成功添加long_address字段到devices表")
+		}
+	}
+
+	// 检查short_address字段是否存在
+	var shortAddressExists int
+	row = db.Raw("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = ? AND table_name = ? AND column_name = ?",
+		cfg.DBName, "devices", "short_address").Row()
+	row.Scan(&shortAddressExists)
+
+	// 如果short_address字段不存在，添加它
+	if shortAddressExists == 0 {
+		if err := db.Exec("ALTER TABLE devices ADD COLUMN short_address VARCHAR(255)").Error; err != nil {
+			return fmt.Errorf("添加short_address字段失败: %w", err)
+		}
+		if cfg.DebugLevel == "true" {
+			log.Println("成功添加short_address字段到devices表")
+		}
+	}
+
+	// 检查ses_key字段是否存在
+	var sesKeyExists int
+	row = db.Raw("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = ? AND table_name = ? AND column_name = ?",
+		cfg.DBName, "devices", "ses_key").Row()
+	row.Scan(&sesKeyExists)
+
+	// 如果ses_key字段不存在，添加它
+	if sesKeyExists == 0 {
+		if err := db.Exec("ALTER TABLE devices ADD COLUMN ses_key VARCHAR(255)").Error; err != nil {
+			return fmt.Errorf("添加ses_key字段失败: %w", err)
+		}
+		if cfg.DebugLevel == "true" {
+			log.Println("成功添加ses_key字段到devices表")
+		}
+	}
+
 	return nil
 }
